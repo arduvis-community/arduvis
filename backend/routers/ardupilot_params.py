@@ -17,31 +17,25 @@
 """
 routers/ardupilot_params.py
 Serves the bundled ArduPilot parameter metadata.
+
+Data is loaded from data.ardupilot_params_data (a Python module) so that
+PyInstaller bundles it automatically without any filesystem path resolution.
 """
 
-import json
-import sys
 from functools import lru_cache
-from pathlib import Path
 
 from fastapi import APIRouter, HTTPException
 
 router = APIRouter()
 
 
-def _data_file() -> Path:
-    if getattr(sys, "frozen", False):
-        # PyInstaller single-file bundle: data lives under sys._MEIPASS/backend/data/
-        return Path(sys._MEIPASS) / "backend" / "data" / "ardupilot_params.json"
-    return Path(__file__).parent.parent / "data" / "ardupilot_params.json"
-
-
 @lru_cache(maxsize=None)
 def _load() -> dict:
-    p = _data_file()
-    if not p.exists():
+    try:
+        from data.ardupilot_params_data import get
+        return get()
+    except Exception:
         return {}
-    return json.loads(p.read_text(encoding="utf-8"))
 
 
 @router.get("/meta")
