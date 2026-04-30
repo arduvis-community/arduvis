@@ -60,6 +60,9 @@ export const api = {
   getComponentDefs: (vehicle) => request('GET', `/components/definitions?vehicle=${vehicle}`),
   getComponentDef:  (defId)   => request('GET', `/components/${defId}`),
 
+  // ArduPilot param metadata
+  getParamMeta:    (vehicle) => request('GET', `/params/meta?vehicle=${vehicle}`),
+
   // MAVLink
   mavConnect:      (cfg)     => request('POST', '/mavlink/connect',        cfg),
   mavStatus:       ()        => request('GET',  '/mavlink/status'),

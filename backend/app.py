@@ -31,7 +31,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 # ── Router imports ────────────────────────────────────────────────────────────
-from routers import components, frames, project, export, validate, mavlink
+from routers import components, frames, project, export, validate, mavlink, ardupilot_params
 
 
 def create_app(dev: bool = False) -> FastAPI:
@@ -67,7 +67,8 @@ def create_app(dev: bool = False) -> FastAPI:
     app.include_router(project.router,    prefix="/api/project",    tags=["project"])
     app.include_router(export.router,     prefix="/api/export",     tags=["export"])
     app.include_router(validate.router,   prefix="/api/validate",   tags=["validate"])
-    app.include_router(mavlink.router,    prefix="/api/mavlink",    tags=["mavlink"])
+    app.include_router(mavlink.router,          prefix="/api/mavlink",    tags=["mavlink"])
+    app.include_router(ardupilot_params.router, prefix="/api/params",    tags=["params"])
 
     # ── Health check ──────────────────────────────────────────────────────────
     @app.get("/api/health")
