@@ -1,0 +1,37 @@
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+*.egg-info/
+
+# Temp files left by the backend dev server
+*.tmp.*
+
+# ── Node ──────────────────────────────────────────────────────────────────────
+node_modules/
+frontend/dist/
+
+# ── PyInstaller / build artefacts ─────────────────────────────────────────────
+dist/
+build/tmp/
+*.manifest
+*.spec.bak
+*.spec.log
+
+# ── Test output ───────────────────────────────────────────────────────────────
+frontend/test-results/
+.pytest_cache/
+
+# ── Claude Code project files ─────────────────────────────────────────────────
+.claude/
+
+# ── Bootstrap / scratch archives (not source) ────────────────────────────────
+*.zip
+*.docx
+~$*.docx
+
+# ── OS ────────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini

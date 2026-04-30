@@ -1,0 +1,155 @@
+// AVC — ArduPilot Visual Configurator
+// Copyright (C) 2026 Patternlynx Limited
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+import React, { useState } from 'react'
+import PoweredByBadge from './PoweredByBadge'
+
+const STORAGE_KEY = 'avc_disclaimer_accepted_v1'
+
+export function needsDisclaimer() {
+  try { return localStorage.getItem(STORAGE_KEY) !== 'yes' } catch { return true }
+}
+
+export default function DisclaimerModal({ onAccept }) {
+  const [checked, setChecked] = useState(false)
+
+  const accept = () => {
+    try { localStorage.setItem(STORAGE_KEY, 'yes') } catch {}
+    onAccept()
+  }
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80">
+      <div className="bg-gray-900 border border-gray-700 rounded-xl w-[620px] max-h-[90vh]
+                      flex flex-col shadow-2xl overflow-hidden">
+
+        {/* Header */}
+        <div className="px-6 pt-6 pb-4 border-b border-gray-700">
+          <div className="flex items-center gap-3 mb-1">
+            <div className="w-6 h-6 rounded-full bg-blue-600 flex-shrink-0" />
+            <span className="text-white font-semibold text-base tracking-wide">
+              ArduPilot Visual Configurator
+            </span>
+          </div>
+          <div className="flex items-center gap-2 mt-2">
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-600/30
+                             border border-amber-600/50 text-amber-300 font-medium uppercase tracking-wider">
+              Beta — Not for Distribution
+            </span>
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-green-600/20
+                             border border-green-600/40 text-green-300 font-medium uppercase tracking-wider">
+              GPL v3
+            </span>
+          </div>
+        </div>
+
+        {/* Body */}
+        <div className="px-6 py-4 overflow-y-auto flex-1 space-y-4 text-sm text-gray-300 leading-relaxed">
+
+          <section>
+            <h3 className="text-white font-semibold mb-1">Beta Disclaimer</h3>
+            <p>
+              This software is provided as a <strong className="text-amber-300">beta release</strong> and
+              is under active development. It may contain bugs, produce incorrect parameter values,
+              or behave unexpectedly. You are solely responsible for verifying all exported parameters
+              before loading them onto any flight controller or operating any aircraft.
+            </p>
+            <p className="mt-2 text-amber-300/90 font-medium">
+              Always perform a full bench test and range check before flying. Never rely solely on
+              this tool for safety-critical configuration.
+            </p>
+          </section>
+
+          <section>
+            <h3 className="text-white font-semibold mb-1">No Warranty</h3>
+            <p>
+              THIS SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+              INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+              PARTICULAR PURPOSE, AND NON-INFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+              HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY ARISING FROM THE USE
+              OF OR IN CONNECTION WITH THIS SOFTWARE.
+            </p>
+          </section>
+
+          <section>
+            <h3 className="text-white font-semibold mb-1">License — GNU General Public License v3</h3>
+            <p>
+              This software is licensed under the{' '}
+              <strong className="text-blue-300">GNU General Public License v3.0 (GPL-3.0)</strong>.
+              You may use, copy, modify, and distribute this software under the terms of the GPL v3.
+              Any distributed versions, including modified versions, must also be released under GPL v3
+              with source code made available.
+            </p>
+            <p className="mt-2">
+              Copyright © {new Date().getFullYear()} Patternlynx Limited.
+            </p>
+            <PoweredByBadge />
+            <p className="mt-1">
+              This program is free software: you can redistribute it and/or modify it under
+              the terms of the GNU General Public License as published by the Free Software
+              Foundation, either version 3 of the License, or (at your option) any later version.
+            </p>
+          </section>
+
+          <section>
+            <h3 className="text-white font-semibold mb-1">Supported Hardware</h3>
+            <p>
+              This beta release is configured and validated for use with{' '}
+              <strong className="text-white">CubePilot Cube</strong> flight controllers only.
+              Use with other hardware is unsupported and may produce incorrect results.
+            </p>
+          </section>
+
+        </div>
+
+        {/* Footer */}
+        <div className="px-6 py-4 border-t border-gray-700 bg-gray-900/80">
+          <label className="flex items-start gap-3 cursor-pointer mb-4 group">
+            <input
+              type="checkbox"
+              checked={checked}
+              onChange={e => setChecked(e.target.checked)}
+              className="mt-0.5 w-4 h-4 accent-blue-500 cursor-pointer flex-shrink-0"
+            />
+            <span className="text-xs text-gray-400 group-hover:text-gray-300 leading-relaxed">
+              I have read and understood the beta disclaimer, warranty exclusion, and license terms.
+              I accept full responsibility for verifying any configuration before flight.
+            </span>
+          </label>
+          <div className="flex gap-3">
+            <button
+              onClick={accept}
+              disabled={!checked}
+              className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
+                checked
+                  ? 'bg-blue-600 hover:bg-blue-500 text-white'
+                  : 'bg-gray-700 text-gray-500 cursor-not-allowed'
+              }`}>
+              I Accept — Continue
+            </button>
+            <button
+              onClick={() => window.close()}
+              className="px-4 py-2 rounded-lg border border-gray-600 text-gray-400
+                         hover:bg-gray-800 text-sm transition-colors">
+              Decline
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  )
+}

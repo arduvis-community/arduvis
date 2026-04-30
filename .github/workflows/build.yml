@@ -1,0 +1,182 @@
+name: Build AVC
+
+on:
+  workflow_dispatch:        # manual trigger from GitHub Actions tab
+  push:
+    tags:
+      - 'v*'               # also runs on version tags, e.g. v0.2.0
+
+jobs:
+  # ── Read build number (shared across all platform jobs) ────────────────────
+  version:
+    runs-on: ubuntu-latest
+    outputs:
+      build_num: ${{ steps.read.outputs.build_num }}
+      build_tag: ${{ steps.read.outputs.build_tag }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: read
+        run: |
+          NUM=$(cat BUILD_NUMBER | tr -d '[:space:]')
+          TAG=$(printf "b%03d" $NUM)
+          echo "build_num=$NUM" >> $GITHUB_OUTPUT
+          echo "build_tag=$TAG" >> $GITHUB_OUTPUT
+          echo "Building $TAG (build $NUM)"
+
+  # ── Windows ────────────────────────────────────────────────────────────────
+  build-windows:
+    needs: version
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python deps
+        run: |
+          python -m venv backend/.venv
+          backend\.venv\Scripts\pip install --upgrade pip
+          backend\.venv\Scripts\pip install fastapi uvicorn pywebview pymavlink pyinstaller
+
+      - name: Build frontend
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build
+
+      - name: Build EXE
+        run: |
+          $OutDir = "dist/beta/${{ needs.version.outputs.build_tag }}/windows"
+          New-Item -ItemType Directory -Force -Path $OutDir | Out-Null
+          backend\.venv\Scripts\pyinstaller build/avc.spec `
+            --distpath $OutDir `
+            --workpath build/tmp `
+            --clean
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AVC-${{ needs.version.outputs.build_tag }}-windows
+          path: dist/beta/${{ needs.version.outputs.build_tag }}/windows/AVC.exe
+          retention-days: 90
+
+  # ── Linux ──────────────────────────────────────────────────────────────────
+  build-linux:
+    needs: version
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pywebview system deps
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y --no-install-recommends \
+            python3-gi python3-gi-cairo gir1.2-gtk-3.0 \
+            gir1.2-webkit2-4.0 libgirepository1.0-dev \
+            gcc libcairo2-dev pkg-config python3-dev \
+            libglib2.0-dev libdbus-1-dev
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python deps
+        run: |
+          python -m venv backend/.venv
+          backend/.venv/bin/pip install --upgrade pip
+          backend/.venv/bin/pip install fastapi uvicorn pywebview pymavlink pyinstaller
+          backend/.venv/bin/pip install PyGObject --no-build-isolation || true
+
+      - name: Build frontend
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build
+
+      - name: Build Linux bundle
+        run: |
+          OUT="dist/beta/${{ needs.version.outputs.build_tag }}/linux"
+          mkdir -p "$OUT"
+          backend/.venv/bin/pyinstaller build/avc.spec \
+            --distpath "$OUT" \
+            --workpath build/tmp \
+            --clean
+
+      - name: Package as tar.gz
+        run: |
+          TAG="${{ needs.version.outputs.build_tag }}"
+          cd "dist/beta/$TAG/linux"
+          tar -czf "AVC-${TAG}-linux-x86_64.tar.gz" avc/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AVC-${{ needs.version.outputs.build_tag }}-linux
+          path: dist/beta/${{ needs.version.outputs.build_tag }}/linux/AVC-${{ needs.version.outputs.build_tag }}-linux-x86_64.tar.gz
+          retention-days: 90
+
+  # ── macOS ──────────────────────────────────────────────────────────────────
+  build-macos:
+    needs: version
+    runs-on: macos-14        # Apple Silicon (M1) runner
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python deps
+        run: |
+          python -m venv backend/.venv
+          backend/.venv/bin/pip install --upgrade pip
+          backend/.venv/bin/pip install fastapi uvicorn pywebview pymavlink pyinstaller
+
+      - name: Build frontend
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build
+
+      - name: Build macOS app
+        run: |
+          TAG="${{ needs.version.outputs.build_tag }}"
+          OUT="dist/beta/$TAG/macos"
+          mkdir -p "$OUT"
+          backend/.venv/bin/pyinstaller build/avc.spec \
+            --distpath "$OUT" \
+            --workpath build/tmp \
+            --clean
+
+      - name: Package as zip
+        run: |
+          TAG="${{ needs.version.outputs.build_tag }}"
+          cd "dist/beta/$TAG/macos"
+          zip -r "AVC-${TAG}-macos-arm64.zip" AVC.app/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AVC-${{ needs.version.outputs.build_tag }}-macos
+          path: dist/beta/${{ needs.version.outputs.build_tag }}/macos/AVC-${{ needs.version.outputs.build_tag }}-macos-arm64.zip
+          retention-days: 90
