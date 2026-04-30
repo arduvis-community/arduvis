@@ -32,6 +32,7 @@ export default function Toolbar() {
     newProject,
     mavlinkConnected, mavlinkModalOpen, setMavlinkModalOpen,
     toggleInspector,
+    advancedParamsOpen, toggleAdvancedParams,
     standardViewsOpen, setStandardViewsOpen,
     canvasMode, setCanvasMode,
     showWires, setShowWires,
@@ -228,6 +229,14 @@ export default function Toolbar() {
       <button onClick={toggleInspector}
         className="text-xs px-2 py-1 rounded border border-gray-600 text-gray-300 hover:bg-gray-700">
         Inspector
+      </button>
+      <button onClick={toggleAdvancedParams}
+        className={`text-xs px-2 py-1 rounded border transition-colors ${
+          advancedParamsOpen
+            ? 'border-blue-500 bg-blue-900/40 text-blue-300'
+            : 'border-gray-600 text-gray-400 hover:bg-gray-700 hover:text-gray-200'
+        }`}>
+        Params
       </button>
 
       <button
