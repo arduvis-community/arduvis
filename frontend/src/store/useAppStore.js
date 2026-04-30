@@ -66,7 +66,13 @@ export const useAppStore = create(
 
       // ── Baseline params (original import — re-emitted on export) ──────────
       baselineParams: {},
-      setBaselineParams: (p) => set({ baselineParams: p || {}, isDirty: true }),
+      setBaselineParams:   (p)      => set({ baselineParams: p || {}, isDirty: true }),
+      setBaselineParam:    (key, v) => set(s => ({ baselineParams: { ...s.baselineParams, [key.toUpperCase()]: v }, isDirty: true })),
+      deleteBaselineParam: (key)    => set(s => { const p = { ...s.baselineParams }; delete p[key]; return { baselineParams: p, isDirty: true } }),
+
+      // ── Advanced params panel ──────────────────────────────────────────────
+      advancedParamsOpen: false,
+      toggleAdvancedParams: () => set(s => ({ advancedParamsOpen: !s.advancedParamsOpen, inspectorOpen: false })),
 
       // ── Components (canvas blocks) ─────────────────────────────────────────
       components: [],
@@ -151,7 +157,7 @@ export const useAppStore = create(
 
       selectComponent:          (id) => set({ selectedComponentId: id, inspectorOpen: true }),
       deselectAll:              ()   => set({ selectedComponentId: null }),
-      toggleInspector:          ()   => set(s => ({ inspectorOpen: !s.inspectorOpen })),
+      toggleInspector:          ()   => set(s => ({ inspectorOpen: !s.inspectorOpen, advancedParamsOpen: false })),
       toggleSidebar:            ()   => set(s => ({ sidebarOpen: !s.sidebarOpen })),
       setStandardViewsOpen:     (b)  => set({ standardViewsOpen: b }),
       setSaveModalOpen:         (b)  => set({ saveModalOpen: b }),
@@ -232,6 +238,7 @@ export const useAppStore = create(
           canvas: { zoom: s.zoom, panX: s.panX, panY: s.panY, activeView: s.activeView },
           airframeTop:    s.backgroundImageTop    ?? null,
           airframeBottom: s.backgroundImageBottom ?? null,
+          baselineParams: s.baselineParams,
           basePath:       basePath ?? null,
         }
         await api.saveProject(payload)
