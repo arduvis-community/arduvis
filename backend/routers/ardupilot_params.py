@@ -20,6 +20,7 @@ Serves the bundled ArduPilot parameter metadata.
 """
 
 import json
+import sys
 from functools import lru_cache
 from pathlib import Path
 
@@ -27,14 +28,20 @@ from fastapi import APIRouter, HTTPException
 
 router = APIRouter()
 
-_DATA_FILE = Path(__file__).parent.parent / "data" / "ardupilot_params.json"
+
+def _data_file() -> Path:
+    if getattr(sys, "frozen", False):
+        # PyInstaller single-file bundle: data lives under sys._MEIPASS/backend/data/
+        return Path(sys._MEIPASS) / "backend" / "data" / "ardupilot_params.json"
+    return Path(__file__).parent.parent / "data" / "ardupilot_params.json"
 
 
 @lru_cache(maxsize=None)
 def _load() -> dict:
-    if not _DATA_FILE.exists():
+    p = _data_file()
+    if not p.exists():
         return {}
-    return json.loads(_DATA_FILE.read_text(encoding="utf-8"))
+    return json.loads(p.read_text(encoding="utf-8"))
 
 
 @router.get("/meta")
