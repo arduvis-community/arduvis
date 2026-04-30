@@ -1,7 +1,6 @@
 # ArduPilot Visual Configurator (AVC) — Community Edition
 
-> **Beta — Not for Distribution.** This is a pre-release build intended for
-> internal testing only. Public release will follow once stabilised.
+> **Beta** — Active development. Always verify exported parameters on the bench before flying.
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
 
