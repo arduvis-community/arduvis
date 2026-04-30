@@ -25,6 +25,7 @@ PyInstaller bundles it automatically without any filesystem path resolution.
 from functools import lru_cache
 
 from fastapi import APIRouter, HTTPException
+from data.ardupilot_params_data import get as _get_param_data
 
 router = APIRouter()
 
@@ -32,8 +33,7 @@ router = APIRouter()
 @lru_cache(maxsize=None)
 def _load() -> dict:
     try:
-        from data.ardupilot_params_data import get
-        return get()
+        return _get_param_data()
     except Exception:
         return {}
 
