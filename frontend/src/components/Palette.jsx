@@ -174,11 +174,10 @@ export default function Palette() {
       return
     }
 
-    const frameComp       = all.find(c => FRAME_IDS.includes(c.defId))
-    const frameConfigured = frameComp && Object.keys(frameComp.fields ?? {}).length > 0
-    const hasImage        = !!(backgroundImageTop || backgroundImageBottom)
+    const frameComp = all.find(c => FRAME_IDS.includes(c.defId))
+    const hasImage  = !!(backgroundImageTop || backgroundImageBottom)
 
-    if (!frameConfigured) {
+    if (!frameComp) {
       e.preventDefault()
       showBlock('Set up your Frame first — choose a frame type in the Inspector.')
       return
