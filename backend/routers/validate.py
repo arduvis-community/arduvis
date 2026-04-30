@@ -37,7 +37,7 @@ def validate(req: ValidateRequest):
         errors.append({
             "component_id": None,
             "field": "autopilot_cube",
-            "message": "Community Edition supports one autopilot only.",
+            "message": "Community Edition supports one autopilot. Upgrade to AVC Pro for redundant configurations.",
         })
 
     for c in req.components:

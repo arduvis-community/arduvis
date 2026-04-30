@@ -20,10 +20,11 @@ import Toolbar from './components/Toolbar'
 import Palette from './components/Palette'
 import CanvasArea from './components/CanvasArea'
 import Inspector from './components/Inspector'
+import AdvancedParamsPanel from './components/AdvancedParamsPanel'
 import DisclaimerModal, { needsDisclaimer } from './components/DisclaimerModal'
 
 export default function App() {
-  const { checkHealth, backendHealth, sidebarOpen, inspectorOpen } = useAppStore()
+  const { checkHealth, backendHealth, sidebarOpen, inspectorOpen, advancedParamsOpen } = useAppStore()
   const [showDisclaimer, setShowDisclaimer] = useState(needsDisclaimer)
 
   // Ping backend on mount
@@ -35,7 +36,8 @@ export default function App() {
       <div className="flex flex-1 overflow-hidden">
         {sidebarOpen && <Palette />}
         <CanvasArea />
-        {inspectorOpen && <Inspector />}
+        {advancedParamsOpen && <AdvancedParamsPanel />}
+        {!advancedParamsOpen && inspectorOpen && <Inspector />}
       </div>
       {/* Backend status indicator */}
       {!backendHealth && (

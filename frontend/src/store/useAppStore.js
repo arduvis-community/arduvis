@@ -108,7 +108,7 @@ export const useAppStore = create(
         isDirty: true,
       })),
 
-      // ── Wire routing ────────────────────────────────────────────────────────
+      // ── Wire routing (read-only in CE — Pro writes waypoints) ─────────────
       showWires:     true,
       wireWaypoints: {},   // { [`${compId}:${fcId}`]: [{x, y}] }
 

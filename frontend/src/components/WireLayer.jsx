@@ -145,7 +145,7 @@ function WireGroup({ connection, waypoints, panX, panY, zoom, opacity,
         ))
       )}
 
-      {/* Draggable waypoint handles (onAddWaypoint defined when enabled) */}
+      {/* Draggable waypoint handles — Pro only (onAddWaypoint defined) */}
       {onAddWaypoint && waypoints.map((wp, idx) => (
         <WaypointHandle
           key={idx}

@@ -108,6 +108,7 @@ class SavePayload(BaseModel):
     airframeTop:    Optional[str] = None   # data URL
     airframeBottom: Optional[str] = None   # data URL
     basePath:       Optional[str] = None   # custom save directory; defaults to PROJECTS_DIR
+    baselineParams: Optional[dict[str, Any]] = None
 
 
 # ── Routes ────────────────────────────────────────────────────────────────────
@@ -180,6 +181,7 @@ def save_project(payload: SavePayload):
         "canvas":             payload.canvas,
         "airframeTopFile":    top_file,
         "airframeBottomFile": bot_file,
+        "baselineParams":     payload.baselineParams or {},
     }
     (folder / "layout.json").write_text(json.dumps(layout, indent=2))
 
