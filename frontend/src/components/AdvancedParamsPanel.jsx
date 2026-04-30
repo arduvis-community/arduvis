@@ -203,12 +203,17 @@ function ParamRow({ paramKey, meta, currentValue, isSelected, onSelect, onSet, o
 
       {/* Top row: param key + current value / set control */}
       <div className="flex items-center gap-1.5">
-        <span className={`text-[11px] font-mono flex-1 min-w-0 truncate
-          ${isSet ? 'text-blue-300' : 'text-gray-400'}`}
-          title={paramKey}>
-          {shortKey}
-          {meta?.rr && <span className="ml-1 text-[8px] text-amber-500" title="Reboot required">↺</span>}
-        </span>
+        <div className="flex-1 min-w-0">
+          <div className={`text-[11px] font-mono truncate
+            ${isSet ? 'text-blue-300' : 'text-gray-400'}`}
+            title={paramKey}>
+            {shortKey}
+            {meta?.rr && <span className="ml-1 text-[8px] text-amber-500" title="Reboot required">↺</span>}
+          </div>
+          {meta?.n && !isSelected && (
+            <div className="text-[10px] text-gray-500 truncate leading-tight">{meta.n}</div>
+          )}
+        </div>
 
         {/* Value control */}
         {isSet && !editing && (
