@@ -791,15 +791,15 @@ COMPONENT_DEFS: list[dict[str, Any]] = [
                  "bits": [{"bit": 0, "label": "Fundamental"},
                            {"bit": 1, "label": "2nd harmonic"},
                            {"bit": 2, "label": "3rd harmonic"}]},
-                {"key": "ins_hntch_ref",    "label": "Reference value",     "type": "number", "min": 0, "max": 1, "default": 0,
+                {"key": "ins_hntch_ref",    "label": "Reference value",     "type": "number", "min": 0, "max": 1, "default": 0, "advanced": True,
                  "tooltip": "Throttle value at hover used as the frequency reference for throttle-based notch tracking.",
                  "docs_param": "INS_HNTCH_REF",
                  "note": "INS_HNTCH_REF — throttle reference value used in throttle-based tracking mode."},
-                {"key": "ins_hntch_fm_rat", "label": "Min freq ratio",      "type": "number", "min": 0.1, "max": 1, "default": 1,
+                {"key": "ins_hntch_fm_rat", "label": "Min freq ratio",      "type": "number", "min": 0.1, "max": 1, "default": 1, "advanced": True,
                  "tooltip": "Ratio of the notch minimum frequency to the base frequency. Prevents the notch from tracking too low.",
                  "docs_param": "INS_HNTCH_FM_RAT",
                  "note": "INS_HNTCH_FM_RAT — ratio of notch min frequency to base frequency."},
-                {"key": "ins_hntch_opts",   "label": "Options (bitmask)",   "type": "bitmask", "default": 0,
+                {"key": "ins_hntch_opts",   "label": "Options (bitmask)",   "type": "bitmask", "default": 0, "advanced": True,
                  "tooltip": "Advanced notch options: dynamic harmonic tracking, multi-source (per-motor) notching.",
                  "docs_param": "INS_HNTCH_OPTS",
                  "note": "INS_HNTCH_OPTS — Bit 0: Dynamically track harmonics. Bit 1: Enable multi-source. Bit 2: Treat single source as per-motor.",
@@ -807,7 +807,7 @@ COMPONENT_DEFS: list[dict[str, Any]] = [
                            {"bit": 1, "label": "Multi-source tracking"},
                            {"bit": 2, "label": "Per-motor (single source)"}]},
             ]},
-            {"label": "Notch filter 2 (INS_HNTC2)", "fields": [
+            {"label": "Notch filter 2 (INS_HNTC2)", "advanced": True, "fields": [
                 {"key": "ins_hntc2_enable", "label": "Enable notch filter 2", "type": "toggle", "default": False,
                  "tooltip": "Activates a second independent notch filter for additional noise rejection.",
                  "docs_param": "INS_HNTC2_ENABLE"},
@@ -1202,14 +1202,6 @@ COMPONENT_DEFS: list[dict[str, Any]] = [
                  "bits": [{"bit": 0, "label": "Ignore RC receiver failsafe"},
                            {"bit": 2, "label": "Multiple receiver support"},
                            {"bit": 4, "label": "Ignore RC in servo-only mode"}]},
-                {"key": "rc_protocols", "label": "RC_PROTOCOLS (bitmask)", "type": "bitmask", "default": 0,
-                 "note": "Bitmask of allowed input protocols. 0 = all. Set specific bits to restrict (e.g. bit 0=PPM, 1=IBUS, 2=SBUS, 5=CRSF, 9=SRXL2).",
-                 "bits": [{"bit": 0, "label": "PPM"},
-                           {"bit": 1, "label": "IBUS"},
-                           {"bit": 2, "label": "SBUS"},
-                           {"bit": 3, "label": "DSM"},
-                           {"bit": 5, "label": "CRSF / ExpressLRS"},
-                           {"bit": 9, "label": "SRXL2"}]},
                 {"key": "rc_fs_timeout", "label": "Failsafe timeout", "type": "number", "min": 100, "max": 10000, "default": 1500, "unit": "ms",
                  "note": "Time with no RC signal before failsafe triggers.",
                  "tooltip": "Duration of RC signal loss required to trigger the RC failsafe. 1500 ms is a safe default.",
@@ -1399,7 +1391,7 @@ COMPONENT_DEFS: list[dict[str, Any]] = [
         "icon": "📋", "vehicles": ["copter", "plane", "vtol"], "virtual": True, "multi": False,
         "maxInstances": None, "connections": [],
         "inspector": [
-            {"label": "Log control", "fields": [
+            {"label": "Log control", "advanced": True, "fields": [
                 {"key": "log_bitmask",      "label": "LOG_BITMASK",            "type": "bitmask", "default": 65535,
                  "note": "Bitmask of what to log. 65535 = everything (default). Reduce for lower-speed SD cards.",
                  "bits": [{"bit": 0,  "label": "Attitude (fast)"},
@@ -2841,7 +2833,7 @@ COMPONENT_DEFS: list[dict[str, Any]] = [
         "icon": "🎯", "vehicles": ["copter", "vtol"], "virtual": True, "multi": False,
         "maxInstances": None, "connections": [],
         "inspector": [
-            {"label": "Roll (ATC_RAT_RLL_*)", "fields": [
+            {"label": "Roll (ATC_RAT_RLL_*)", "advanced": True, "fields": [
                 {"key": "atc_rat_rll_p",    "label": "Roll P",       "type": "number", "min": 0.01, "max": 0.5,  "default": 0.135, "note": "ATC_RAT_RLL_P",
                  "tooltip": "Roll rate proportional gain. Higher = faster roll response. Too high = oscillation.", "docs_param": "ATC_RAT_RLL_P"},
                 {"key": "atc_rat_rll_i",    "label": "Roll I",       "type": "number", "min": 0.01, "max": 0.5,  "default": 0.135, "note": "ATC_RAT_RLL_I",
@@ -2861,7 +2853,7 @@ COMPONENT_DEFS: list[dict[str, Any]] = [
                 {"key": "atc_rat_rll_fltd", "label": "Roll D-term filt","type": "number","min": 0,  "max": 50,   "default": 20,    "unit": "Hz", "note": "ATC_RAT_RLL_FLTD",
                  "tooltip": "Low-pass filter on the roll D-term input. Reduces high-frequency noise amplified by the derivative.", "docs_param": "ATC_RAT_RLL_FLTD"},
             ]},
-            {"label": "Pitch (ATC_RAT_PIT_*)", "fields": [
+            {"label": "Pitch (ATC_RAT_PIT_*)", "advanced": True, "fields": [
                 {"key": "atc_rat_pit_p",    "label": "Pitch P",        "type": "number", "min": 0.01, "max": 0.5,  "default": 0.135,
                  "tooltip": "Pitch rate P gain.", "docs_param": "ATC_RAT_PIT_P"},
                 {"key": "atc_rat_pit_i",    "label": "Pitch I",        "type": "number", "min": 0.01, "max": 0.5,  "default": 0.135,
@@ -2881,7 +2873,7 @@ COMPONENT_DEFS: list[dict[str, Any]] = [
                 {"key": "atc_rat_pit_fltd", "label": "Pitch D-term filt","type": "number","min": 0,   "max": 50,   "default": 20, "unit": "Hz",
                  "tooltip": "Pitch D-term filter frequency.", "docs_param": "ATC_RAT_PIT_FLTD"},
             ]},
-            {"label": "Yaw (ATC_RAT_YAW_*)", "fields": [
+            {"label": "Yaw (ATC_RAT_YAW_*)", "advanced": True, "fields": [
                 {"key": "atc_rat_yaw_p",    "label": "Yaw P",        "type": "number", "min": 0.1, "max": 2.5, "default": 0.18,
                  "tooltip": "Yaw rate P gain.", "docs_param": "ATC_RAT_YAW_P"},
                 {"key": "atc_rat_yaw_i",    "label": "Yaw I",        "type": "number", "min": 0.01,"max": 1,   "default": 0.018,
@@ -2901,7 +2893,7 @@ COMPONENT_DEFS: list[dict[str, Any]] = [
                 {"key": "atc_rat_yaw_fltd", "label": "Yaw D-term filt","type": "number","min": 0,   "max": 50,  "default": 20, "unit": "Hz",
                  "tooltip": "Yaw D-term filter frequency.", "docs_param": "ATC_RAT_YAW_FLTD"},
             ]},
-            {"label": "Angle limits & behaviour", "fields": [
+            {"label": "Angle limits & behaviour", "advanced": True, "fields": [
                 {"key": "atc_angle_boost",   "label": "Angle boost",       "type": "toggle", "default": True,
                  "note": "ATC_ANGLE_BOOST — increase throttle to maintain altitude during banked turns.",
                  "tooltip": "Automatically increases throttle during banked turns to compensate for reduced lift.",

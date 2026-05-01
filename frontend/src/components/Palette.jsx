@@ -17,6 +17,7 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react'
 import { useAppStore } from '../store/useAppStore'
 import { api } from '../api/client'
+import { computeComplete } from '../utils/componentUtils'
 
 const FRAME_IDS = ['frame_copter', 'frame_plane', 'frame_vtol']
 
@@ -234,9 +235,8 @@ export default function Palette() {
             )}
 
             {setupDefs.map(def => {
-              const inst       = components.find(c => c.defId === def.id)
-              const hasFields  = inst?.fields && Object.keys(inst.fields).length > 0
-              const isConfigured = !!inst && hasFields
+              const inst         = components.find(c => c.defId === def.id)
+              const isConfigured = !!inst && computeComplete(inst, def)
 
               return (
                 <div

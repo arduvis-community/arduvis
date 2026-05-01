@@ -36,6 +36,7 @@ export default function Toolbar() {
     standardViewsOpen, setStandardViewsOpen,
     canvasMode, setCanvasMode,
     showWires, setShowWires,
+    exportIncludeDefaults, setExportIncludeDefaults,
   } = useAppStore()
 
   const [showProjects, setShowProjects] = useState(false)
@@ -64,11 +65,12 @@ export default function Toolbar() {
   const [importPreview, setImportPreview] = useState(null)  // { params, count, vehicle_type, components } | null
 
   const handleExport = async () => {
-    const { components, vehicleType, vehicleLabel, frameInfo, baselineParams } = useAppStore.getState()
+    const { components, vehicleType, vehicleLabel, frameInfo, baselineParams, exportIncludeDefaults } = useAppStore.getState()
     try {
       const content  = await api.exportParam({
         components, vehicle_type: vehicleType, vehicle_label: vehicleLabel,
         frame_info: frameInfo, baseline_params: baselineParams || {},
+        include_defaults: exportIncludeDefaults,
       })
       const filename = `${vehicleLabel.replace(/\s+/g, '_')}.param`
       if (window.pywebview) {
@@ -308,11 +310,23 @@ export default function Toolbar() {
 
       <div className="w-px h-5 bg-gray-700" />
 
-      <button onClick={handleExport}
-        className="text-xs px-3 py-1 rounded border border-blue-600 text-blue-300
-                   hover:bg-blue-900/40 font-medium">
-        Export .param
-      </button>
+      <div className="flex items-center gap-1">
+        <button onClick={handleExport}
+          className="text-xs px-3 py-1 rounded-l border border-blue-600 text-blue-300
+                     hover:bg-blue-900/40 font-medium">
+          Export .param
+        </button>
+        <label title="Include default parameter values in export"
+          className={`flex items-center gap-1 text-[10px] px-1.5 py-1 rounded-r border-y border-r cursor-pointer
+            ${exportIncludeDefaults
+              ? 'border-blue-600 bg-blue-900/30 text-blue-300'
+              : 'border-blue-600/50 text-gray-500 hover:text-blue-400'}`}>
+          <input type="checkbox" className="hidden"
+            checked={exportIncludeDefaults}
+            onChange={e => setExportIncludeDefaults(e.target.checked)} />
+          +defaults
+        </label>
+      </div>
 
       <input
         ref={paramImportRef}

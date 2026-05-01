@@ -26,21 +26,41 @@ from pathlib import Path
 from datetime import date
 
 from data.param_mappings import build_param_list, parse_param_file, build_components_from_params
+from data.component_defs import COMPONENT_DEFS_MAP
 
 router = APIRouter()
 EXPORTS_DIR = Path.home() / ".avc" / "exports"
 
 
 class ExportRequest(BaseModel):
-    components:      list[dict[str, Any]]
-    vehicle_type:    str            # 'copter' | 'plane' | 'vtol'
-    vehicle_label:   str
-    frame_info:      dict[str, Any] | None = None
-    baseline_params: dict[str, Any] | None = None  # original imported params — passthrough
+    components:       list[dict[str, Any]]
+    vehicle_type:     str            # 'copter' | 'plane' | 'vtol'
+    vehicle_label:    str
+    frame_info:       dict[str, Any] | None = None
+    baseline_params:  dict[str, Any] | None = None  # original imported params — passthrough
+    include_defaults: bool = False   # when True, fill unset fields with schema defaults before export
 
 
 class ImportRequest(BaseModel):
     content: str   # raw text of the .param file
+
+
+def _fill_defaults(components: list[dict]) -> list[dict]:
+    """Return a copy of components with schema defaults filled in for any unset fields."""
+    result = []
+    for comp in components:
+        def_schema = COMPONENT_DEFS_MAP.get(comp.get("defId", ""))
+        if not def_schema:
+            result.append(comp)
+            continue
+        filled_fields = dict(comp.get("fields") or {})
+        for group in def_schema.get("inspector", []):
+            for field in group.get("fields", []):
+                key = field.get("key")
+                if key and key not in filled_fields and field.get("default") is not None:
+                    filled_fields[key] = field["default"]
+        result.append({**comp, "fields": filled_fields})
+    return result
 
 
 def _fmt(value) -> str:
@@ -58,7 +78,8 @@ def export_param(req: ExportRequest) -> str:
     All remaining baseline params are emitted in a passthrough section so that
     calibration data, PID tuning, and other non-UI params are preserved.
     """
-    result   = build_param_list(req.components, req.vehicle_type)
+    components = _fill_defaults(req.components) if req.include_defaults else req.components
+    result   = build_param_list(components, req.vehicle_type)
     flat:    list[dict]       = result["flat"]
     grouped: dict[str, list]  = result["grouped"]
 
@@ -80,6 +101,7 @@ def export_param(req: ExportRequest) -> str:
         f"# Firmware         : {req.vehicle_type}",
         f"# Vehicle          : {req.vehicle_label}",
         f"# Parameters       : {total_count}",
+        f"# Defaults included: {'yes' if req.include_defaults else 'no — non-default params only'}",
         "# NOTE: Beta software — verify all parameters before flight.",
         "",
     ]

@@ -41,6 +41,7 @@ import { createPortal } from 'react-dom'
 import { useAppStore } from '../store/useAppStore'
 import { api } from '../api/client'
 import PinSelector from './PinSelector'
+import { fieldVisible, computeComplete } from '../utils/componentUtils'
 
 const FRAME_DEF_IDS = new Set(['frame_copter', 'frame_plane', 'frame_vtol'])
 const MOTOR_IDS     = ['motor', 'esc']
@@ -133,52 +134,7 @@ const CUBE_VARIANT_ICONS = {
   cube_blue: '🟦', cube_red: '🟥', cube_mini: '⬜',
 }
 
-// ── dependsOn visibility logic ────────────────────────────────────────────────
-// depVal: '!9' = not-equal, [1,3] = in-array, true/false = truthy test,
-//          number/string = strict equality
-function fieldVisible(field, fields) {
-  const dep = field.dependsOn
-  if (!dep) return true
-  if (dep.allOf) return dep.allOf.every(d => fieldVisible({ dependsOn: d }, fields))
-
-  const actual = fields[dep.field]
-  const depVal = dep.value
-
-  if (typeof depVal === 'string' && depVal.startsWith('!'))
-    return String(actual) !== depVal.slice(1)
-
-  if (Array.isArray(depVal))
-    return depVal.some(v => String(v) === String(actual))
-
-  if (typeof depVal === 'boolean')
-    return depVal ? !!actual : !actual
-
-  return String(actual) === String(depVal)
-}
-
-// ── Complete-flag computation ─────────────────────────────────────────────────
-// Returns true when every visible required:true field has a non-empty value.
-// A field counts as having a value if component.fields[key] is set, OR if the
-// field schema has a default (meaning the user can accept it without touching it).
-function computeComplete(component, def) {
-  if (!def?.inspector) return false
-  for (const group of def.inspector) {
-    for (const field of group.fields) {
-      if (!field.required) continue
-      // Skip required fields hidden by dependsOn
-      if (!fieldVisible(field, component.fields)) continue
-
-      if (field.type === 'pinSelect') {
-        if (!component.outputPin) return false
-      } else {
-        // Explicit value beats default; a non-null default counts as "configured"
-        const v = component.fields[field.key] ?? field.default
-        if (v === undefined || v === null || v === '') return false
-      }
-    }
-  }
-  return true
-}
+// fieldVisible and computeComplete imported from ../utils/componentUtils
 
 // ── Shared input / select classes ─────────────────────────────────────────────
 const INPUT_CLS =
@@ -445,10 +401,12 @@ function FieldRow({ field, component, onFieldChange, onPinChange, usedPins, vehi
 
 // ── Inspector group block ─────────────────────────────────────────────────────
 
-function InspectorGroup({ group, component, vehicleType, onFieldChange, onPinChange, usedPins, claimedPorts }) {
+function InspectorGroup({ group, component, vehicleType, onFieldChange, onPinChange, usedPins, claimedPorts, simpleMode }) {
+  if (simpleMode && group.advanced) return null
   const visibleFields = group.fields.filter(f =>
     fieldVisible(f, component.fields) &&
-    (!f.vehicle || f.vehicle === vehicleType)
+    (!f.vehicle || f.vehicle === vehicleType) &&
+    !(simpleMode && f.advanced)
   )
   if (!visibleFields.length) return null
 
@@ -493,6 +451,7 @@ export default function Inspector() {
     setStandardViewsOpen,
     activeViewMotorCount,
     canvasMode,
+    inspectorSimpleMode, toggleInspectorSimpleMode,
   } = useAppStore()
 
   const component    = components.find(c => c.id === selectedComponentId)
@@ -664,7 +623,18 @@ export default function Inspector() {
             Del
           </button>
         </div>
-        <div className="text-[10px] text-gray-600 mt-0.5">{component.defId}</div>
+        <div className="flex items-center justify-between mt-0.5">
+          <div className="text-[10px] text-gray-600">{component.defId}</div>
+          <button onClick={toggleInspectorSimpleMode}
+            className={`text-[9px] px-1.5 py-0.5 rounded border transition-colors ${
+              inspectorSimpleMode
+                ? 'border-gray-600 text-gray-500 hover:text-gray-300'
+                : 'border-blue-700/60 bg-blue-900/20 text-blue-400'
+            }`}
+            title={inspectorSimpleMode ? 'Show all fields' : 'Hide advanced fields'}>
+            {inspectorSimpleMode ? 'Simple' : 'Full'}
+          </button>
+        </div>
       </div>
 
       {/* Body */}
@@ -837,6 +807,7 @@ export default function Inspector() {
                 usedPins={usedPins}
                 claimedPorts={component.defId === 'servo_outputs'
                   ? computeClaimedPorts(components) : undefined}
+                simpleMode={inspectorSimpleMode}
               />
             ))}
           </>

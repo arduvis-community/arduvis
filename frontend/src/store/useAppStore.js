@@ -74,6 +74,14 @@ export const useAppStore = create(
       advancedParamsOpen: false,
       toggleAdvancedParams: () => set(s => ({ advancedParamsOpen: !s.advancedParamsOpen, inspectorOpen: false })),
 
+      // ── Export options ─────────────────────────────────────────────────────
+      exportIncludeDefaults: false,
+      setExportIncludeDefaults: (v) => set({ exportIncludeDefaults: v }),
+
+      // ── Inspector display mode ─────────────────────────────────────────────
+      inspectorSimpleMode: true,
+      toggleInspectorSimpleMode: () => set(s => ({ inspectorSimpleMode: !s.inspectorSimpleMode })),
+
       // ── Components (canvas blocks) ─────────────────────────────────────────
       components: [],
 
@@ -293,6 +301,7 @@ export const useAppStore = create(
         showWires:            s.showWires,
         wireWaypoints:        s.wireWaypoints,
         isDirty:              s.isDirty,
+        inspectorSimpleMode:  s.inspectorSimpleMode,
       }),
 
       // After rehydration, sync the id counter so new components don't collide.
