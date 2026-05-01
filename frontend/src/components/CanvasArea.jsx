@@ -394,18 +394,6 @@ export default function CanvasArea() {
           ))}
 
         </Layer>
-
-        {/* Fixed watermark — not affected by pan/zoom */}
-        <Layer listening={false}>
-          <Text
-            text="BETA — Not validated for flight use"
-            x={8} y={stageSize.h - 22}
-            fontSize={11}
-            fontFamily="monospace"
-            fill="rgba(251,191,36,0.35)"
-            listening={false} />
-        </Layer>
-
       </Stage>
 
       {/* Onboarding hint */}

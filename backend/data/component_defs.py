@@ -926,10 +926,10 @@ COMPONENT_DEFS: list[dict[str, Any]] = [
         "maxInstances": None, "connections": [],
         "inspector": [
             {"label": "Arming checks", "fields": [
-                {"key": "arming_check",     "label": "Arming checks (bitmask)", "type": "bitmask", "default": 1,
-                 "tooltip": "Pre-arm safety checks. Bit 0 enables all checks. Disable individual bits only if you understand the risk.",
+                {"key": "arming_check",     "label": "Arming checks — ArduPilot ≤4.6 only", "type": "bitmask", "default": 1,
+                 "tooltip": "ARMING_CHECK was removed in ArduPilot 4.7. This field only applies to firmware 4.6 and earlier. On 4.7+ all pre-arm checks are enabled by default and cannot be individually disabled via this parameter.",
                  "docs_param": "ARMING_CHECK",
-                 "note": "0=disable all, 1=all checks. Individual bits disable specific checks.",
+                 "note": "⚠ Deprecated in ArduPilot 4.7 — this parameter no longer exists in firmware 4.7 or later. Leave at default (1 = all checks) unless on 4.6 or earlier.",
                  "bits": [{"bit": 0,  "label": "All checks"},
                            {"bit": 1,  "label": "Barometer"},
                            {"bit": 2,  "label": "Compass"},
