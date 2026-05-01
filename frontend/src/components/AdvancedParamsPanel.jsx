@@ -114,6 +114,11 @@ export default function AdvancedParamsPanel() {
         {totalSet > 0 ? ` · ${totalSet} overridden in this project` : ''}
       </p>
 
+      {/* TEMP DIAGNOSTIC — remove after confirming fix */}
+      <p className="px-3 pb-1 text-[10px] text-yellow-400 flex-shrink-0">
+        DBG: {totalMeta} keys · first="{Object.keys(meta)[0] ?? 'none'}"
+      </p>
+
       {/* Param list */}
       <div className="flex-1 overflow-y-auto px-2 pb-2">
         {loading ? (
