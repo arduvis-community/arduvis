@@ -9,6 +9,8 @@ AVC is a visual drag-and-drop tool for configuring ArduPilot flight controllers.
 Build your hardware layout on a canvas, set parameters through the Inspector,
 and export a ready-to-use `.param` file.
 
+**[Changelog](CHANGELOG.md)** — what's new in each build &nbsp;|&nbsp; **[User Guide](docs/user-guide.md)** — full documentation
+
 **Community Edition** — free and open-source under the GNU GPL v3.
 Enterprise support and branded builds are available separately (see below).
 
