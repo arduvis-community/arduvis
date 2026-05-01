@@ -82,6 +82,12 @@ export const useAppStore = create(
       inspectorSimpleMode: true,
       toggleInspectorSimpleMode: () => set(s => ({ inspectorSimpleMode: !s.inspectorSimpleMode })),
 
+      // ── Param comparison ───────────────────────────────────────────────────
+      comparisonResult: null,
+      comparisonModalOpen: false,
+      setComparisonResult:    (r) => set({ comparisonResult: r }),
+      setComparisonModalOpen: (b) => set({ comparisonModalOpen: b }),
+
       // ── Components (canvas blocks) ─────────────────────────────────────────
       components: [],
 

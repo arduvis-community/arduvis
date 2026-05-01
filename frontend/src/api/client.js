@@ -62,6 +62,7 @@ export const api = {
 
   // ArduPilot param metadata
   getParamMeta:    (vehicle) => request('GET', `/params/meta?vehicle=${vehicle}`),
+  compareParam:    (payload) => request('POST', '/export/compare',             payload),
 
   // MAVLink
   mavConnect:      (cfg)     => request('POST', '/mavlink/connect',        cfg),

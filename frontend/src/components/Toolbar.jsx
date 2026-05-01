@@ -37,6 +37,7 @@ export default function Toolbar() {
     canvasMode, setCanvasMode,
     showWires, setShowWires,
     exportIncludeDefaults, setExportIncludeDefaults,
+    setComparisonResult, setComparisonModalOpen,
   } = useAppStore()
 
   const [showProjects, setShowProjects] = useState(false)
@@ -62,6 +63,7 @@ export default function Toolbar() {
     return () => document.removeEventListener('mousedown', handle)
   }, [showFileMenu])
   const paramImportRef   = useRef(null)
+  const paramCompareRef  = useRef(null)
   const [importPreview, setImportPreview] = useState(null)  // { params, count, vehicle_type, components } | null
 
   const handleExport = async () => {
@@ -94,6 +96,24 @@ export default function Toolbar() {
       const result = await api.importParam(text)
       setImportPreview(result)
     } catch (err) { console.error('param import failed', err) }
+  }
+
+  const handleParamCompare = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const text = await file.text()
+    e.target.value = ''
+    try {
+      const { components, vehicleType, baselineParams } = useAppStore.getState()
+      const result = await api.compareParam({
+        components, vehicle_type: vehicleType,
+        baseline_params: baselineParams || {},
+        include_defaults: true,
+        reference_content: text,
+      })
+      setComparisonResult(result)
+      setComparisonModalOpen(true)
+    } catch (err) { console.error('param compare failed', err) }
   }
 
   const applyImport = () => {
@@ -340,6 +360,21 @@ export default function Toolbar() {
         className="text-xs px-3 py-1 rounded border border-gray-600 text-gray-300
                    hover:bg-gray-700">
         Import .param
+      </button>
+
+      <input
+        ref={paramCompareRef}
+        type="file"
+        accept=".param,.parm,.txt"
+        className="hidden"
+        onChange={handleParamCompare}
+      />
+      <button
+        onClick={() => paramCompareRef.current?.click()}
+        title="Compare AVC output against a reference .param file from Mission Planner"
+        className="text-xs px-3 py-1 rounded border border-amber-700/60 text-amber-400
+                   hover:bg-amber-900/30">
+        Compare
       </button>
     </div>
 

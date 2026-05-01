@@ -21,10 +21,12 @@ import Palette from './components/Palette'
 import CanvasArea from './components/CanvasArea'
 import Inspector from './components/Inspector'
 import AdvancedParamsPanel from './components/AdvancedParamsPanel'
+import ParamComparisonModal from './components/ParamComparisonModal'
 import DisclaimerModal, { needsDisclaimer } from './components/DisclaimerModal'
 
 export default function App() {
-  const { checkHealth, backendHealth, sidebarOpen, inspectorOpen, advancedParamsOpen } = useAppStore()
+  const { checkHealth, backendHealth, sidebarOpen, inspectorOpen, advancedParamsOpen,
+          comparisonModalOpen } = useAppStore()
   const [showDisclaimer, setShowDisclaimer] = useState(needsDisclaimer)
 
   // Ping backend on mount
@@ -46,6 +48,7 @@ export default function App() {
           Backend not responding
         </div>
       )}
+      {comparisonModalOpen && <ParamComparisonModal />}
       {showDisclaimer && (
         <DisclaimerModal onAccept={() => setShowDisclaimer(false)} />
       )}

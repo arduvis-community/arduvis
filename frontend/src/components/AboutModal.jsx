@@ -55,6 +55,9 @@ export default function AboutModal({ onClose }) {
               <span className="text-gray-400">Hardware support:</span> CubePilot Cube (this beta release)
             </div>
             <div>
+              <span className="text-gray-400">Firmware:</span> ArduPilot 4.7 or later required
+            </div>
+            <div>
               <span className="text-gray-400">Copyright:</span> Patternlynx Limited
             </div>
             <div>
