@@ -37,7 +37,7 @@ export default function PinSelector({ value, usedPins = new Set(), onChange }) {
 
   function btnClass(pin) {
     if (pin === value)
-      return 'bg-blue-600 border-blue-400 text-white ring-1 ring-blue-400'
+      return 'bg-amber-600 border-blue-400 text-white ring-1 ring-blue-400'
     if (usedPins.has(pin))
       return 'bg-gray-900 border-gray-700 text-gray-600 opacity-40 cursor-not-allowed'
     return 'bg-gray-700 border-gray-500 text-gray-200 hover:bg-gray-600 hover:border-blue-400 hover:text-white'

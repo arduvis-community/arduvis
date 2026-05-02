@@ -264,7 +264,7 @@ export default function Palette() {
           {/* ── Divider ─────────────────────────────────────────────────── */}
           <div
             onMouseDown={onDividerMouseDown}
-            className="flex-none h-1.5 bg-gray-700 hover:bg-blue-600/60 cursor-row-resize
+            className="flex-none h-1.5 bg-gray-700 hover:bg-amber-600/60 cursor-row-resize
                        flex items-center justify-center transition-colors group"
             title="Drag to resize">
             <div className="w-6 h-0.5 rounded-full bg-gray-500 group-hover:bg-blue-400 transition-colors" />
@@ -290,7 +290,7 @@ export default function Palette() {
                     draggable
                     onDragStart={e => handleDragStart(e, def)}
                     className="flex items-center gap-2 px-3 py-2 cursor-grab hover:bg-gray-700/60
-                               border-l-2 border-transparent hover:border-blue-500 transition-all">
+                               border-l-2 border-transparent hover:border-amber-500 transition-all">
                     <span className="flex-shrink-0" style={{ fontSize: 13 }}>{def.icon}</span>
                     <span className="text-xs text-gray-300 leading-tight">{def.label}</span>
                   </div>

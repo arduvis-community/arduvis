@@ -33,6 +33,7 @@ export default function Toolbar() {
     mavlinkConnected, mavlinkModalOpen, setMavlinkModalOpen,
     toggleInspector,
     advancedParamsOpen, toggleAdvancedParams,
+    checklistOpen, toggleChecklist,
     standardViewsOpen, setStandardViewsOpen,
     canvasMode, setCanvasMode,
     showWires, setShowWires,
@@ -148,7 +149,7 @@ export default function Toolbar() {
 
       {/* Logo */}
       <div className="flex items-center gap-2 mr-2">
-        <div className="w-5 h-5 rounded-full bg-blue-600 flex-shrink-0" />
+        <div className="w-5 h-5 rounded-full bg-amber-600 flex-shrink-0" />
         <span className="text-sm font-semibold text-white tracking-wide">AVC</span>
       </div>
 
@@ -243,7 +244,7 @@ export default function Toolbar() {
         onClick={() => setCanvasMode('standard')}
         className={`text-xs px-2 py-1 rounded border transition-colors ${
           canvasMode !== 'topology'
-            ? 'border-blue-500 bg-blue-900/40 text-blue-300'
+            ? 'border-amber-500 bg-amber-900/20 text-amber-300'
             : 'border-gray-600 text-gray-400 hover:bg-gray-700 hover:text-gray-200'
         }`}>
         Palette
@@ -255,10 +256,19 @@ export default function Toolbar() {
       <button onClick={toggleAdvancedParams}
         className={`text-xs px-2 py-1 rounded border transition-colors ${
           advancedParamsOpen
-            ? 'border-blue-500 bg-blue-900/40 text-blue-300'
+            ? 'border-amber-500 bg-amber-900/20 text-amber-300'
             : 'border-gray-600 text-gray-400 hover:bg-gray-700 hover:text-gray-200'
         }`}>
         Params
+      </button>
+      <button onClick={toggleChecklist}
+        title="Step-by-step setup checklist"
+        className={`text-xs px-2 py-1 rounded border transition-colors ${
+          checklistOpen
+            ? 'border-green-500 bg-green-900/40 text-green-300'
+            : 'border-gray-600 text-gray-400 hover:bg-gray-700 hover:text-gray-200'
+        }`}>
+        Checklist
       </button>
 
       <button
@@ -266,7 +276,7 @@ export default function Toolbar() {
         title="CAN Topology view"
         className={`text-xs px-2 py-1 rounded border transition-colors ${
           canvasMode === 'topology'
-            ? 'border-blue-500 bg-blue-900/40 text-blue-300'
+            ? 'border-amber-500 bg-amber-900/20 text-amber-300'
             : 'border-gray-600 text-gray-400 hover:bg-gray-700 hover:text-gray-200'
         }`}>
         Topology
@@ -332,15 +342,15 @@ export default function Toolbar() {
 
       <div className="flex items-center gap-1">
         <button onClick={handleExport}
-          className="text-xs px-3 py-1 rounded-l border border-blue-600 text-blue-300
-                     hover:bg-blue-900/40 font-medium">
+          className="text-xs px-3 py-1 rounded-l border border-amber-600 text-amber-300
+                     hover:bg-amber-900/20 font-medium">
           Export .param
         </button>
         <label title="Include default parameter values in export"
           className={`flex items-center gap-1 text-[10px] px-1.5 py-1 rounded-r border-y border-r cursor-pointer
             ${exportIncludeDefaults
-              ? 'border-blue-600 bg-blue-900/30 text-blue-300'
-              : 'border-blue-600/50 text-gray-500 hover:text-blue-400'}`}>
+              ? 'border-amber-600 bg-amber-900/20 text-amber-300'
+              : 'border-amber-600/50 text-gray-500 hover:text-amber-400'}`}>
           <input type="checkbox" className="hidden"
             checked={exportIncludeDefaults}
             onChange={e => setExportIncludeDefaults(e.target.checked)} />
@@ -392,7 +402,7 @@ export default function Toolbar() {
               <span className="text-sm font-semibold text-white">Import .param</span>
               <span className="ml-2 text-xs text-gray-400">
                 {importPreview.count} parameters →&nbsp;
-                <span className="text-blue-300">{importPreview.components.length} components</span>
+                <span className="text-amber-300">{importPreview.components.length} components</span>
                 &nbsp;·&nbsp;
                 <span className="text-gray-300 capitalize">{importPreview.vehicle_type}</span>
               </span>
@@ -435,7 +445,7 @@ export default function Toolbar() {
                 <tbody>
                   {Object.entries(importPreview.params).map(([name, val]) => (
                     <tr key={name} className="border-b border-gray-800/60">
-                      <td className="py-0.5 pr-2 text-blue-300">{name}</td>
+                      <td className="py-0.5 pr-2 text-amber-300">{name}</td>
                       <td className="py-0.5 text-right text-gray-400">{val}</td>
                     </tr>
                   ))}
@@ -455,8 +465,8 @@ export default function Toolbar() {
                 Cancel
               </button>
               <button onClick={applyImport}
-                className="text-xs px-4 py-1.5 rounded border border-blue-600 bg-blue-700/20
-                           text-blue-300 hover:bg-blue-700/40 font-medium">
+                className="text-xs px-4 py-1.5 rounded border border-amber-600 bg-amber-700/20
+                           text-amber-300 hover:bg-amber-700/30 font-medium">
                 Apply to canvas
               </button>
             </div>

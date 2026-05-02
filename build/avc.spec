@@ -54,6 +54,8 @@ a = Analysis(
         "pymavlink.dialects.v20.ardupilotmega",
         "pymavlink.dialects.v20.common",
         "pymavlink.generator",
+        # ArduPilot param data — large module, explicit hint ensures it's in PYZ
+        "data.ardupilot_params_data",
     ],
     hookspath=[],
     hooksconfig={},

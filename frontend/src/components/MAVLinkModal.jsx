@@ -162,7 +162,7 @@ export default function MAVLinkModal({ onClose }) {
                 <button
                   onClick={handleUpload}
                   disabled={busy}
-                  className="text-xs px-4 py-2 rounded bg-blue-700 hover:bg-blue-600
+                  className="text-xs px-4 py-2 rounded bg-amber-700 hover:bg-amber-600
                              text-white disabled:opacity-50 disabled:cursor-not-allowed">
                   Upload params to FC
                 </button>
@@ -199,7 +199,7 @@ export default function MAVLinkModal({ onClose }) {
                       value={host}
                       onChange={e => setHost(e.target.value)}
                       className="text-xs bg-gray-800 border border-gray-600 rounded px-2 py-1.5
-                                 text-gray-200 focus:outline-none focus:border-blue-500"
+                                 text-gray-200 focus:outline-none focus:border-amber-500"
                       placeholder="127.0.0.1"
                     />
                   </div>
@@ -210,7 +210,7 @@ export default function MAVLinkModal({ onClose }) {
                       value={port}
                       onChange={e => setPort(e.target.value)}
                       className="text-xs bg-gray-800 border border-gray-600 rounded px-2 py-1.5
-                                 text-gray-200 focus:outline-none focus:border-blue-500"
+                                 text-gray-200 focus:outline-none focus:border-amber-500"
                     />
                   </div>
                   <div className="flex flex-col gap-1 w-20">
@@ -219,7 +219,7 @@ export default function MAVLinkModal({ onClose }) {
                       value={protocol}
                       onChange={e => setProtocol(e.target.value)}
                       className="text-xs bg-gray-800 border border-gray-600 rounded px-2 py-1.5
-                                 text-gray-200 focus:outline-none focus:border-blue-500">
+                                 text-gray-200 focus:outline-none focus:border-amber-500">
                       {PROTOCOLS.map(p => <option key={p}>{p}</option>)}
                     </select>
                   </div>
@@ -249,7 +249,7 @@ export default function MAVLinkModal({ onClose }) {
             <button
               onClick={handleConnect}
               disabled={busy}
-              className="text-xs px-4 py-1.5 rounded bg-blue-700 hover:bg-blue-600
+              className="text-xs px-4 py-1.5 rounded bg-amber-700 hover:bg-amber-600
                          text-white disabled:opacity-50 disabled:cursor-not-allowed">
               {busy ? 'Connecting…' : 'Connect'}
             </button>
@@ -302,7 +302,7 @@ function ErrorBanner({ msg }) {
 
 function BusyBanner({ msg }) {
   return (
-    <div className="text-xs text-blue-300 bg-blue-400/10 border border-blue-800
+    <div className="text-xs text-amber-300 bg-blue-400/10 border border-blue-800
                     rounded px-3 py-2 flex items-center gap-2">
       <span className="inline-block w-3 h-3 border-2 border-blue-400 border-t-transparent
                        rounded-full animate-spin" />

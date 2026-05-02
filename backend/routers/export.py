@@ -53,20 +53,39 @@ class CompareRequest(BaseModel):
     reference_content: str          # raw .param file text from Mission Planner / GCS
 
 
+# Components whose number-field defaults are vehicle-specific tuning values.
+# These are NOT exported with +defaults — only user-set values are included.
+# Prevents unverified Claude-authored defaults from reaching a real flight controller.
+_TUNING_COMPONENT_IDS = frozenset({
+    "attitude_controller", "position_controller", "ekf_config",
+    "harmonic_notch", "acro_config", "wpnav_config", "rtl_config",
+    "logging_config", "obstacle_avoidance",
+})
+
+
 def _fill_defaults(components: list[dict]) -> list[dict]:
-    """Return a copy of components with schema defaults filled in for any unset fields."""
+    """Return a copy of components with schema defaults filled in for any unset fields.
+
+    Tuning components (PIDs, EKF, notch filter, etc.) are excluded — their number
+    field defaults are vehicle-specific and must be explicitly set by the user.
+    """
     result = []
     for comp in components:
         def_schema = COMPONENT_DEFS_MAP.get(comp.get("defId", ""))
         if not def_schema:
             result.append(comp)
             continue
+        is_tuning = comp.get("defId") in _TUNING_COMPONENT_IDS
         filled_fields = dict(comp.get("fields") or {})
         for group in def_schema.get("inspector", []):
             for field in group.get("fields", []):
                 key = field.get("key")
-                if key and key not in filled_fields and field.get("default") is not None:
-                    filled_fields[key] = field["default"]
+                if not key or key in filled_fields or field.get("default") is None:
+                    continue
+                # Skip unset number fields in tuning components
+                if is_tuning and field.get("type") == "number":
+                    continue
+                filled_fields[key] = field["default"]
         result.append({**comp, "fields": filled_fields})
     return result
 

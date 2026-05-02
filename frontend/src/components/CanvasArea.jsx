@@ -14,13 +14,19 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import { useRef, useCallback, useEffect, useState } from 'react'
+import React, { useRef, useCallback, useEffect, useState, useMemo } from 'react'
 import { Stage, Layer, Rect, Group, Text, Circle, Image as KonvaImage } from 'react-konva'
 import { useAppStore } from '../store/useAppStore'
 import WireLayer from './WireLayer'
 import CanTopologyView from './CanTopologyView'
 
 const STATUS_COLORS = { green: '#4ade80', amber: '#fbbf24', gray: '#6b7280' }
+
+// DefIds whose drop opens ManufacturerPickerModal instead of placing directly
+const PICKER_ENABLED_DEFS = new Set([
+  'servo', 'esc',
+  'gps', 'airspeed', 'battery_monitor', 'rangefinder', 'adsb',
+])
 
 function componentStatus(c) {
   if (c.complete === true)  return 'green'
@@ -34,6 +40,40 @@ function componentStatus(c) {
 const CHIP_W = 160
 const CHIP_H = 32
 const DRAG_THRESHOLD = 6   // px — cursor must move this far before drag starts
+
+function DotGridLayer({ width, height, panX, panY, zoom }) {
+  const spacing = 24
+  const patternCanvas = useMemo(() => {
+    const c = document.createElement('canvas')
+    c.width = spacing; c.height = spacing
+    const ctx = c.getContext('2d')
+    ctx.clearRect(0, 0, spacing, spacing)
+    ctx.beginPath()
+    ctx.arc(spacing / 2, spacing / 2, 1, 0, Math.PI * 2)
+    ctx.fillStyle = 'rgba(255,255,255,0.07)'
+    ctx.fill()
+    return c
+  }, [])
+
+  const scaledSpacing = spacing * zoom
+  const offsetX = ((panX % scaledSpacing) + scaledSpacing) % scaledSpacing
+  const offsetY = ((panY % scaledSpacing) + scaledSpacing) % scaledSpacing
+
+  return (
+    <Layer listening={false}>
+      <Rect x={0} y={0} width={width} height={height} fill="#0A0E1A" />
+      <Rect
+        x={0} y={0} width={width} height={height}
+        fillPatternImage={patternCanvas}
+        fillPatternScaleX={zoom} fillPatternScaleY={zoom}
+        fillPatternOffsetX={spacing / 2 - offsetX / zoom}
+        fillPatternOffsetY={spacing / 2 - offsetY / zoom}
+        listening={false}
+      />
+    </Layer>
+  )
+}
+
 
 function chipDisplayLabel(component, allComponents) {
   const { defId, label, fields } = component
@@ -70,7 +110,7 @@ function BlockChip({ component, allComponents, isSelected }) {
       <Rect
         width={CHIP_W} height={CHIP_H} cornerRadius={6}
         fill="rgba(17,24,39,0.92)"
-        stroke={isSelected ? '#3b82f6' : 'rgba(255,255,255,0.10)'}
+        stroke={isSelected ? '#D97706' : 'rgba(255,255,255,0.08)'}
         strokeWidth={isSelected ? 1.5 : 0.5} />
       <Text text={icon} x={7} y={9} fontSize={14} />
       <Text
@@ -84,6 +124,7 @@ function BlockChip({ component, allComponents, isSelected }) {
   )
 }
 
+
 export default function CanvasArea() {
   const {
     components, selectComponent, deselectAll, moveComponent, addComponent,
@@ -93,7 +134,8 @@ export default function CanvasArea() {
     snapEnabled, snapSize,
     selectedComponentId,
     canvasMode,
-    showWires, wireWaypoints,
+    openManufacturerPicker,
+    showWires, wireWaypoints, setWireWaypoints, removeWireWaypoint,
   } = useAppStore()
 
   const stageRef     = useRef(null)
@@ -108,7 +150,7 @@ export default function CanvasArea() {
   // Always-fresh canvas + snap state for [] callbacks
   const liveRef = useRef({})
   const bgUrl = activeView === 'top' ? backgroundImageTop : backgroundImageBottom
-  liveRef.current = { panX, panY, zoom, components, snapEnabled, snapSize, bgUrl }
+  liveRef.current = { panX, panY, zoom, components, snapEnabled, snapSize, bgUrl, canvasMode }
 
   // Active gesture state — never triggers re-render
   const panRef  = useRef(null)   // { startX, startY, startPanX, startPanY }
@@ -171,8 +213,8 @@ export default function CanvasArea() {
   // ── Drop ──────────────────────────────────────────────────────────────────────
   const handleDrop = useCallback((e) => {
     e.preventDefault()
-    const { panX, panY, zoom, snapEnabled, snapSize, bgUrl } = liveRef.current
-    if (!bgUrl) return
+    const { panX, panY, zoom, snapEnabled, snapSize, bgUrl, canvasMode } = liveRef.current
+    if (!bgUrl && canvasMode !== 'topology') return
     const raw = e.dataTransfer.getData('application/avc-component')
     if (!raw) return
     const item = JSON.parse(raw)
@@ -180,8 +222,12 @@ export default function CanvasArea() {
     const rect = e.currentTarget.getBoundingClientRect()
     const x = snap((e.clientX - rect.left - panX) / zoom)
     const y = snap((e.clientY - rect.top  - panY) / zoom)
+    if (PICKER_ENABLED_DEFS.has(item.defId) && typeof openManufacturerPicker === 'function') {
+      openManufacturerPicker({ defId: item.defId, label: item.label, icon: item.icon, virtual: item.virtual, x, y })
+      return
+    }
     addComponent(item.defId, item.label, item.icon, item.virtual, x, y)
-  }, [addComponent])
+  }, [addComponent, openManufacturerPicker])
 
   // ── Window-level mouse: handles both pan tracking and chip drag ───────────────
   useEffect(() => {
@@ -258,6 +304,9 @@ export default function CanvasArea() {
   }, [])
 
   // ── Primary interaction handler ───────────────────────────────────────────────
+  // Pure-math bounds check: avoids Konva hit-canvas which breaks at non-zero
+  // pan+zoom (Konva bug — hit canvas pixel sampling is misaligned when Layer
+  // has both translation and scale applied simultaneously).
   const handleDivMouseDown = useCallback((e) => {
     if (e.button !== 0) return
     const { panX, panY, zoom, components } = liveRef.current
@@ -309,7 +358,7 @@ export default function CanvasArea() {
     setPan(nx, ny)
   }, [setZoom, setPan])
 
-  // ── Topology mode — pure HTML+SVG view (no Konva canvas) ─────────────────────
+  // ── Topology mode — pure HTML+SVG view (no Konva canvas) ────────────────────
   if (canvasMode === 'topology') {
     return <CanTopologyView />
   }
@@ -336,7 +385,7 @@ export default function CanvasArea() {
                 disabled
                   ? 'bg-gray-800/40 text-gray-600 cursor-not-allowed'
                   : isActive
-                    ? 'bg-blue-700/60 text-white'
+                    ? 'bg-amber-700/60 text-white'
                     : 'bg-gray-800/80 text-gray-400 hover:text-gray-200'}`}>
               {v.charAt(0).toUpperCase() + v.slice(1)} view
               {disabled && <span className="ml-1 text-gray-700">—</span>}
@@ -350,6 +399,9 @@ export default function CanvasArea() {
         width={stageSize.w}
         height={stageSize.h}
         onWheel={handleWheel}>
+
+        {/* Dot-grid background — fixed in screen space */}
+        <DotGridLayer width={stageSize.w} height={stageSize.h} panX={panX} panY={panY} zoom={zoom} />
 
         <Layer x={panX} y={panY} scaleX={zoom} scaleY={zoom}>
 
@@ -374,7 +426,7 @@ export default function CanvasArea() {
             ))
           )}
 
-          {/* Wire routing layer — read-only in CE (no waypoint editing) */}
+          {/* Wire routing layer */}
           {showWires && (
             <WireLayer
               components={components}
@@ -382,6 +434,8 @@ export default function CanvasArea() {
               canvasMode={canvasMode}
               panX={panX} panY={panY} zoom={zoom}
               selectedComponentId={selectedComponentId}
+              onAddWaypoint={setWireWaypoints}
+              onRemoveWaypoint={removeWireWaypoint}
             />
           )}
 
@@ -394,6 +448,20 @@ export default function CanvasArea() {
           ))}
 
         </Layer>
+
+        {/* Fixed watermark — centred above zoom controls */}
+        <Layer listening={false}>
+          <Text
+            text="BETA — Not validated for flight use"
+            x={0} y={stageSize.h - 52}
+            width={stageSize.w}
+            align="center"
+            fontSize={11}
+            fontFamily="monospace"
+            fill="rgba(251,191,36,0.30)"
+            listening={false} />
+        </Layer>
+
       </Stage>
 
       {/* Onboarding hint */}

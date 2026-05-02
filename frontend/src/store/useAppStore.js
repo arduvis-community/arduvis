@@ -72,7 +72,11 @@ export const useAppStore = create(
 
       // ── Advanced params panel ──────────────────────────────────────────────
       advancedParamsOpen: false,
-      toggleAdvancedParams: () => set(s => ({ advancedParamsOpen: !s.advancedParamsOpen, inspectorOpen: false })),
+      toggleAdvancedParams: () => set(s => ({ advancedParamsOpen: !s.advancedParamsOpen, inspectorOpen: false, checklistOpen: false })),
+
+      // ── Setup checklist panel ──────────────────────────────────────────────
+      checklistOpen: false,
+      toggleChecklist: () => set(s => ({ checklistOpen: !s.checklistOpen, advancedParamsOpen: false })),
 
       // ── Export options ─────────────────────────────────────────────────────
       exportIncludeDefaults: false,
@@ -171,7 +175,7 @@ export const useAppStore = create(
 
       selectComponent:          (id) => set({ selectedComponentId: id, inspectorOpen: true }),
       deselectAll:              ()   => set({ selectedComponentId: null }),
-      toggleInspector:          ()   => set(s => ({ inspectorOpen: !s.inspectorOpen, advancedParamsOpen: false })),
+      toggleInspector:          ()   => set(s => ({ inspectorOpen: !s.inspectorOpen, advancedParamsOpen: false, checklistOpen: false })),
       toggleSidebar:            ()   => set(s => ({ sidebarOpen: !s.sidebarOpen })),
       setStandardViewsOpen:     (b)  => set({ standardViewsOpen: b }),
       setSaveModalOpen:         (b)  => set({ saveModalOpen: b }),

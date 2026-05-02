@@ -38,7 +38,7 @@ export default function ParamComparisonModal() {
               className="text-gray-400 hover:text-white text-lg leading-none">✕</button>
           </div>
           <div className="flex gap-4 text-xs text-gray-400">
-            <span>AVC generated: <span className="text-blue-300 font-mono">{avc_total}</span></span>
+            <span>AVC generated: <span className="text-amber-300 font-mono">{avc_total}</span></span>
             <span>Reference file: <span className="text-gray-200 font-mono">{ref_total}</span></span>
             <span>Matches: <span className="text-green-400 font-mono">{match_count}</span></span>
           </div>
@@ -69,7 +69,7 @@ export default function ParamComparisonModal() {
                   <div key={param}
                     className="grid grid-cols-3 gap-0 px-3 py-1.5 border-t border-gray-800 text-xs hover:bg-gray-800/40">
                     <span className="font-mono text-amber-300 truncate">{param}</span>
-                    <span className="font-mono text-blue-300">{avc_value}</span>
+                    <span className="font-mono text-amber-300">{avc_value}</span>
                     <span className="font-mono text-gray-300">{ref_value}</span>
                   </div>
                 ))}
@@ -81,10 +81,10 @@ export default function ParamComparisonModal() {
           {avc_only.length > 0 && (
             <section>
               <div className="flex items-center gap-2 mb-2">
-                <span className="text-blue-400 text-sm font-semibold">
+                <span className="text-amber-400 text-sm font-semibold">
                   ℹ AVC only
                 </span>
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-900/30 text-blue-400 border border-blue-900">
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-900/20 text-amber-400 border border-blue-900">
                   {avc_only.length}
                 </span>
                 <span className="text-[10px] text-gray-600">— AVC generates these; reference file doesn't have them</span>
@@ -93,7 +93,7 @@ export default function ParamComparisonModal() {
                 {avc_only.map(({ param, value }) => (
                   <div key={param}
                     className="flex justify-between px-3 py-1 border-b border-gray-800 last:border-0 text-xs hover:bg-gray-800/40">
-                    <span className="font-mono text-blue-300">{param}</span>
+                    <span className="font-mono text-amber-300">{param}</span>
                     <span className="font-mono text-gray-400">{value}</span>
                   </div>
                 ))}
@@ -121,7 +121,7 @@ export default function ParamComparisonModal() {
               onChange={e => setMissingSearch(e.target.value)}
               placeholder="Filter params…"
               className="bg-gray-800 border border-gray-700 text-xs text-gray-200 rounded px-2 py-1 w-full mb-2
-                         focus:outline-none focus:border-blue-500"
+                         focus:outline-none focus:border-amber-500"
             />
             <div className="rounded border border-gray-800 max-h-48 overflow-y-auto">
               {filteredMissing.length === 0 ? (

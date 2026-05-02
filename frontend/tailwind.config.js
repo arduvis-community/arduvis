@@ -4,13 +4,12 @@ export default {
   theme: {
     extend: {
       colors: {
-        // AVC aerospace dark palette
-        canvas:  '#111827',
-        surface: '#1f2937',
-        border:  '#374151',
-        accent:  '#2563eb',
-        'accent-dim': '#1d4ed8',
-        muted:   '#6b7280',
+        // AVC avionics palette
+        'avc-bg':      '#0A0E1A',
+        'avc-surface': '#111827',
+        'avc-border':  '#252D3D',
+        'avc-accent':  '#D97706',
+        'avc-muted':   '#6B7280',
       },
     },
   },

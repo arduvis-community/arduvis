@@ -39,7 +39,7 @@ export default function DisclaimerModal({ onAccept }) {
         {/* Header */}
         <div className="px-6 pt-6 pb-4 border-b border-gray-700">
           <div className="flex items-center gap-3 mb-1">
-            <div className="w-6 h-6 rounded-full bg-blue-600 flex-shrink-0" />
+            <div className="w-6 h-6 rounded-full bg-amber-600 flex-shrink-0" />
             <span className="text-white font-semibold text-base tracking-wide">
               ArduPilot Visual Configurator
             </span>
@@ -105,7 +105,7 @@ export default function DisclaimerModal({ onAccept }) {
             <h3 className="text-white font-semibold mb-1">License — GNU General Public License v3</h3>
             <p>
               This software is licensed under the{' '}
-              <strong className="text-blue-300">GNU General Public License v3.0 (GPL-3.0)</strong>.
+              <strong className="text-amber-300">GNU General Public License v3.0 (GPL-3.0)</strong>.
               You may use, copy, modify, and distribute this software under the terms of the GPL v3.
               Any distributed versions, including modified versions, must also be released under GPL v3
               with source code made available.
@@ -152,7 +152,7 @@ export default function DisclaimerModal({ onAccept }) {
               disabled={!checked}
               className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
                 checked
-                  ? 'bg-blue-600 hover:bg-blue-500 text-white'
+                  ? 'bg-amber-600 hover:bg-blue-500 text-white'
                   : 'bg-gray-700 text-gray-500 cursor-not-allowed'
               }`}>
               I Accept — Continue

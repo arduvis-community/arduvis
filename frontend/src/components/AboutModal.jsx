@@ -33,7 +33,7 @@ export default function AboutModal({ onClose }) {
         <div className="px-5 py-5 flex flex-col gap-4">
 
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-blue-600 flex-shrink-0 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-full bg-amber-600 flex-shrink-0 flex items-center justify-center">
               <span className="text-white text-xs font-bold">AVC</span>
             </div>
             <div>
@@ -47,7 +47,7 @@ export default function AboutModal({ onClose }) {
           <p className="text-xs text-gray-300 leading-relaxed">
             AVC is a visual tool for configuring ArduPilot flight controllers using a
             drag-and-drop canvas. Build your hardware layout, set parameters
-            through the inspector, and export a ready-to-use <span className="text-blue-300">.param</span> file.
+            through the inspector, and export a ready-to-use <span className="text-amber-300">.param</span> file.
           </p>
 
           <div className="text-xs text-gray-500 leading-relaxed border-t border-gray-800 pt-3 flex flex-col gap-1">

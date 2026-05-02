@@ -147,8 +147,8 @@ export default function ProjectsModal({ onClose }) {
                     <button
                       onClick={() => handleOpen(p.name)}
                       disabled={opening === p.name}
-                      className="text-[10px] text-blue-300 hover:text-white px-2.5 py-0.5
-                                 rounded border border-blue-700 hover:bg-blue-700/40
+                      className="text-[10px] text-amber-300 hover:text-white px-2.5 py-0.5
+                                 rounded border border-blue-700 hover:bg-amber-700/40
                                  disabled:opacity-40 font-medium">
                       {opening === p.name ? 'Opening…' : 'Open'}
                     </button>

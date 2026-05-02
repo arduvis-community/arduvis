@@ -242,15 +242,16 @@ export function buildConnections(components, canvasMode) {
   if (canvasMode === 'standard') {
     // Group per FC so we can fan Y offsets
     const outputGroups = {}   // fcId → [comp, ...]
+    const soloFcId = Object.keys(fcMap).length === 1 ? Object.keys(fcMap)[0] : null
     for (const c of components) {
       if (c.noCanvas) continue
       if (c.defId === 'autopilot_cube') continue
       if (c.defId === 'pdb') continue                          // PDB uses fc_power_rails (below)
       if (c.defId === 'motor') continue                        // motors connect to ESCs, not FC
-      if (!c.fields?.output_fc) continue
       if (c.fields?.connection_type === 'dronecan') continue   // handled above
-      const fcId = c.fields.output_fc
-      if (!fcMap[fcId]) continue
+      // Use explicit output_fc, or auto-wire to the only FC when there is exactly one
+      const fcId = c.fields?.output_fc || soloFcId
+      if (!fcId || !fcMap[fcId]) continue
       if (!outputGroups[fcId]) outputGroups[fcId] = []
       outputGroups[fcId].push(c)
     }

@@ -64,7 +64,7 @@ export default function HelpModal({ onClose }) {
         <div className="overflow-y-auto px-5 py-4 flex flex-col gap-3">
           {steps.map((step, i) => (
             <div key={i} className="flex gap-3">
-              <div className="flex-shrink-0 w-5 h-5 rounded-full bg-blue-700 flex items-center
+              <div className="flex-shrink-0 w-5 h-5 rounded-full bg-amber-700 flex items-center
                               justify-center text-[10px] font-bold text-white mt-0.5">
                 {i + 1}
               </div>

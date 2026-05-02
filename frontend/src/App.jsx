@@ -21,12 +21,13 @@ import Palette from './components/Palette'
 import CanvasArea from './components/CanvasArea'
 import Inspector from './components/Inspector'
 import AdvancedParamsPanel from './components/AdvancedParamsPanel'
+import SetupChecklistPanel from './components/SetupChecklistPanel'
 import ParamComparisonModal from './components/ParamComparisonModal'
 import DisclaimerModal, { needsDisclaimer } from './components/DisclaimerModal'
 
 export default function App() {
   const { checkHealth, backendHealth, sidebarOpen, inspectorOpen, advancedParamsOpen,
-          comparisonModalOpen } = useAppStore()
+          checklistOpen, comparisonModalOpen } = useAppStore()
   const [showDisclaimer, setShowDisclaimer] = useState(needsDisclaimer)
 
   // Ping backend on mount
@@ -38,8 +39,9 @@ export default function App() {
       <div className="flex flex-1 overflow-hidden">
         {sidebarOpen && <Palette />}
         <CanvasArea />
-        {advancedParamsOpen && <AdvancedParamsPanel />}
-        {!advancedParamsOpen && inspectorOpen && <Inspector />}
+        {checklistOpen && <SetupChecklistPanel />}
+        {!checklistOpen && advancedParamsOpen && <AdvancedParamsPanel />}
+        {!checklistOpen && !advancedParamsOpen && inspectorOpen && <Inspector />}
       </div>
       {/* Backend status indicator */}
       {!backendHealth && (

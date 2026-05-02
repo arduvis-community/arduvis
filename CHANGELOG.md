@@ -5,6 +5,48 @@ Builds are numbered `b001`, `b002`, … — the build number appears in the wind
 
 ---
 
+## b034 — Avionics theme, full ArduPilot params, wiring fixes
+
+### Visual refresh
+- **Avionics/amber colour scheme** — deep navy background (#0A0E1A), amber/gold active states replacing generic blue. Selected components have an amber border on canvas.
+- **Dot-grid canvas background** — subtle engineering-paper dot grid tracks with pan and zoom.
+- **Inter font** loaded from Google Fonts for a sharper UI.
+- CubePilot hardware badge keeps blue (semantic exception — it identifies hardware, not UI state).
+
+### Full ArduPilot parameter browser
+- **5,691 copter / 5,729 plane parameters** — sourced directly from `autotest.ardupilot.org` (the same source Mission Planner uses). Previous build had ~934/1,167 from a partial source.
+- All `INS_HNTCH_*`, `EK3_*`, `ATC_RAT_*`, and other tuning params now appear with correct descriptions, ranges, units, enum dropdowns, and bitmask checkboxes.
+- **Safer +defaults export** — PID, EKF, notch filter, WPNAV, RTL, and acro number fields are no longer filled when using +defaults. Only values you explicitly set are exported for these components.
+
+### Wiring fixes
+- **ESC drag now works** — ESC, servo, GPS, airspeed, battery monitor, rangefinder, and ADSB components can now be dragged directly onto the canvas.
+- **PWM auto-wiring** — when exactly one flight controller is on the canvas, components without an explicit FC assignment automatically draw a wire to it.
+
+### Setup Checklist fixes
+- Airframe step correctly detects when a standard view is selected.
+- Flight Controller step recognises CubeOrange+ (`autopilot_cube` component).
+- Board Orientation step satisfied by `autopilot_cube` (orientation fields are built in).
+- Clicking a checklist step now closes the panel and opens the Inspector for that component.
+- BETA watermark repositioned to centre-bottom, clear of zoom controls.
+
+---
+
+## b033 — Setup Checklist
+
+### New features
+- **Setup Checklist** — click the green **Checklist** button in the toolbar to open a guided step-by-step configuration panel, similar in spirit to the ArduPilot Methodic Configurator. Shows all required and optional steps for the selected vehicle type:
+  - **Multirotor:** Airframe → Flight Controller → Board Orientation → Motors → ESCs → Battery Monitor → RC Input → GPS → Flight Modes → Failsafe → Arming
+  - **Fixed Wing:** adds Servo Outputs and Airspeed Sensor steps
+  - **VTOL / QuadPlane:** adds QuadPlane Setup and Servo Outputs steps
+- Each step shows its completion status: ✓ complete, ◉ present but incomplete, ○ missing
+- Optional steps (GPS on some vehicles, Arming, Airspeed) are marked with an `optional` badge
+- Clicking a step that has a component selects it and highlights it for inspection
+- Clicking the Airframe step opens the Standard Views selector
+- Progress bar shows required steps complete / total required
+- Green "All required steps complete — Export .param" banner when all required steps done
+
+---
+
 ## b032 — ArduPilot 4.7+ support + param comparison tool
 
 ### Breaking changes

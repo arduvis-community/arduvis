@@ -14,9 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useMemo } from 'react'
 import { useAppStore } from '../store/useAppStore'
-import { api } from '../api/client'
+import ALL_PARAMS from '../data/ardupilotParams'
 
 function groupKey(name) {
   const idx = name.indexOf('_')
@@ -29,19 +29,13 @@ export default function AdvancedParamsPanel() {
     setBaselineParam, deleteBaselineParam, toggleAdvancedParams,
   } = useAppStore()
 
-  const [meta,      setMeta]      = useState({})   // { PARAM_NAME: { n, d, u, v, r, ... } }
-  const [loading,   setLoading]   = useState(true)
   const [search,    setSearch]    = useState('')
   const [collapsed, setCollapsed] = useState(new Set())
-  const [selected,  setSelected]  = useState(null)  // currently focused param key
+  const [selected,  setSelected]  = useState(null)
 
-  // Load full param metadata for current vehicle type
-  useEffect(() => {
-    setLoading(true)
-    api.getParamMeta(vehicleType)
-      .then(data => { setMeta(data); setLoading(false) })
-      .catch(() => setLoading(false))
-  }, [vehicleType])
+  // Param metadata comes from the bundled JS module — no API call needed
+  const key = vehicleType === 'vtol' ? 'plane' : vehicleType
+  const meta = ALL_PARAMS[key] ?? ALL_PARAMS['copter']
 
   const q = search.trim().toUpperCase()
 
@@ -77,13 +71,11 @@ export default function AdvancedParamsPanel() {
       <div className="px-3 py-2.5 border-b border-gray-700 flex-shrink-0 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="text-xs font-semibold text-gray-200">Parameters</span>
-          {!loading && (
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-gray-700 text-gray-400">
-              {q ? `${totalVisible} / ${totalMeta}` : totalMeta}
-            </span>
-          )}
+          <span className="text-[10px] px-1.5 py-0.5 rounded bg-gray-700 text-gray-400">
+            {q ? `${totalVisible} / ${totalMeta}` : totalMeta}
+          </span>
           {totalSet > 0 && (
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-900/50 text-blue-400 border border-blue-800">
+            <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-900/50 text-amber-400 border border-blue-800">
               {totalSet} set
             </span>
           )}
@@ -104,7 +96,7 @@ export default function AdvancedParamsPanel() {
           onChange={e => { setSearch(e.target.value); setSelected(null) }}
           placeholder="Search by name or description…"
           className="bg-gray-900 text-gray-200 text-xs border border-gray-600 rounded px-2 py-1.5 w-full
-                     focus:outline-none focus:border-blue-500"
+                     focus:outline-none focus:border-amber-500"
         />
       </div>
 
@@ -117,9 +109,7 @@ export default function AdvancedParamsPanel() {
 
       {/* Param list */}
       <div className="flex-1 overflow-y-auto px-2 pb-2">
-        {loading ? (
-          <p className="text-[11px] text-gray-500 px-1 pt-3">Loading parameter definitions…</p>
-        ) : groups.length === 0 ? (
+        {groups.length === 0 ? (
           <p className="text-[11px] text-gray-600 px-1 pt-3">No matching parameters.</p>
         ) : groups.map(([groupName, keys]) => (
           <div key={groupName} className="mb-0.5">
@@ -135,7 +125,7 @@ export default function AdvancedParamsPanel() {
               <div className="flex items-center gap-1.5">
                 {/* count of set params in this group */}
                 {keys.filter(k => k in baselineParams).length > 0 && (
-                  <span className="text-[9px] text-blue-400">
+                  <span className="text-[9px] text-amber-400">
                     {keys.filter(k => k in baselineParams).length} set
                   </span>
                 )}
@@ -206,7 +196,7 @@ function ParamRow({ paramKey, meta, currentValue, isSelected, onSelect, onSet, o
       <div className="flex items-center gap-1.5">
         <div className="flex-1 min-w-0">
           <div className={`text-[11px] font-mono truncate
-            ${isSet ? 'text-blue-300' : 'text-gray-400'}`}
+            ${isSet ? 'text-amber-300' : 'text-gray-400'}`}
             title={paramKey}>
             {shortKey}
             {meta?.rr && <span className="ml-1 text-[8px] text-amber-500" title="Reboot required">↺</span>}
@@ -219,7 +209,7 @@ function ParamRow({ paramKey, meta, currentValue, isSelected, onSelect, onSet, o
         {/* Value control */}
         {isSet && !editing && (
           <div className="flex items-center gap-1">
-            <span className="text-[11px] text-blue-300 font-mono">
+            <span className="text-[11px] text-amber-300 font-mono">
               {hasEnums && meta.v[String(currentValue)] ? meta.v[String(currentValue)] : currentValue}
             </span>
             <button onClick={(e) => { e.stopPropagation(); onClear(paramKey) }}
@@ -228,7 +218,7 @@ function ParamRow({ paramKey, meta, currentValue, isSelected, onSelect, onSet, o
         )}
         {!isSet && !editing && (
           <button onClick={startEdit}
-            className="text-[10px] text-gray-600 hover:text-blue-400 opacity-0 group-hover:opacity-100">
+            className="text-[10px] text-gray-600 hover:text-amber-400 opacity-0 group-hover:opacity-100">
             set
           </button>
         )}
@@ -255,7 +245,7 @@ function ParamRow({ paramKey, meta, currentValue, isSelected, onSelect, onSet, o
               value={isSet ? String(currentValue) : ''}
               onChange={handleEnumChange}
               className="w-full bg-gray-900 text-gray-200 text-xs border border-gray-600 rounded px-2 py-1
-                         focus:outline-none focus:border-blue-500">
+                         focus:outline-none focus:border-amber-500">
               {!isSet && <option value="">— not set —</option>}
               {Object.entries(meta.v).map(([val, label]) => (
                 <option key={val} value={val}>{label} ({val})</option>
@@ -269,18 +259,18 @@ function ParamRow({ paramKey, meta, currentValue, isSelected, onSelect, onSet, o
                 onChange={e => setDraft(e.target.value)}
                 onKeyDown={e => { if (e.key === 'Enter') commitEdit(); if (e.key === 'Escape') setEditing(false) }}
                 placeholder={meta?.r ? `${meta.r[0]} – ${meta.r[1]}` : 'value'}
-                className="flex-1 bg-gray-900 text-gray-200 text-xs border border-blue-600 rounded px-2 py-1
+                className="flex-1 bg-gray-900 text-gray-200 text-xs border border-amber-600 rounded px-2 py-1
                            focus:outline-none"
               />
               <button onClick={commitEdit}
-                className="text-xs px-2 py-1 rounded border border-blue-600 bg-blue-900/40 text-blue-300 hover:bg-blue-800/50">
+                className="text-xs px-2 py-1 rounded border border-amber-600 bg-blue-900/40 text-amber-300 hover:bg-blue-800/50">
                 OK
               </button>
             </div>
           ) : (
             <button onClick={startEdit}
               className="w-full text-xs px-2 py-1 rounded border border-gray-600 text-gray-400
-                         hover:border-blue-500 hover:text-blue-300 text-left">
+                         hover:border-amber-500 hover:text-amber-300 text-left">
               {isSet ? `Current: ${currentValue} — click to edit` : 'Click to set value…'}
             </button>
           )}
@@ -295,7 +285,7 @@ function ParamRow({ paramKey, meta, currentValue, isSelected, onSelect, onSet, o
                 return (
                   <label key={bit} className="flex items-center gap-1.5 cursor-pointer group/bit">
                     <span className={`w-3 h-3 flex-shrink-0 rounded border transition-colors
-                      ${checked ? 'bg-blue-600 border-blue-500' : 'border-gray-600 group-hover/bit:border-blue-500'}`}>
+                      ${checked ? 'bg-amber-600 border-amber-500' : 'border-gray-600 group-hover/bit:border-amber-500'}`}>
                       {checked && <svg viewBox="0 0 12 12" fill="white"><path d="M2 6l3 3 5-5"/></svg>}
                     </span>
                     <span className="text-[10px] text-gray-400">{label}</span>

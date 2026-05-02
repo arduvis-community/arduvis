@@ -61,11 +61,11 @@ function FcCard({ fc, isSelected, onClick }) {
       style={{ width: FC_W, height: FC_H }}
       className={`absolute rounded-lg cursor-pointer select-none
                   border bg-[#0a1226]
-                  ${isSelected ? 'border-blue-500 ring-1 ring-blue-500/50' : 'border-blue-900/40'}
+                  ${isSelected ? 'border-amber-500 ring-1 ring-blue-500/50' : 'border-blue-900/40'}
                   transition-colors`}>
-      <div className="absolute left-0 top-3.5 w-[3px] rounded-full bg-blue-700"
+      <div className="absolute left-0 top-3.5 w-[3px] rounded-full bg-amber-700"
         style={{ height: FC_H - 28 }} />
-      <div className="absolute text-blue-300 font-bold text-[22px] leading-none"
+      <div className="absolute text-amber-300 font-bold text-[22px] leading-none"
         style={{ left: 14, top: 14, fontFamily: 'system-ui' }}>
         FC {fcNum}
       </div>
@@ -78,7 +78,7 @@ function FcCard({ fc, isSelected, onClick }) {
         style={{ right: 12, top: 12, width: 38, height: 32 }}>
         <span style={{ fontSize: 18 }}>{chipIcon}</span>
       </div>
-      <div className="absolute text-[9px] text-blue-300/65 text-right"
+      <div className="absolute text-[9px] text-amber-300/65 text-right"
         style={{ right: 54, top: CAN1_PORT_Y - 7, fontFamily: 'system-ui' }}>CAN1</div>
       <div className="absolute text-[9px] text-purple-300/65 text-right"
         style={{ right: 54, top: CAN2_PORT_Y - 7, fontFamily: 'system-ui' }}>CAN2</div>
@@ -91,7 +91,7 @@ function LeafCard({ comp, isSelected, onClick, buses = [1] }) {
   const dual     = buses.length === 2
   const primary  = buses[0]
   const color    = dual ? 'border-blue-800/30' : primary === 2 ? 'border-purple-800/40' : 'border-blue-800/30'
-  const selColor = primary === 2 && !dual ? 'border-purple-400' : 'border-blue-500'
+  const selColor = primary === 2 && !dual ? 'border-purple-400' : 'border-amber-500'
   return (
     <div
       onClick={onClick}
@@ -105,7 +105,7 @@ function LeafCard({ comp, isSelected, onClick, buses = [1] }) {
       <span className="text-[11px] text-gray-300 truncate flex-1" style={{ fontFamily: 'system-ui' }}>
         {comp.label}
       </span>
-      {dual && <span className="text-[8px] text-blue-400/70 flex-shrink-0 leading-none">dual</span>}
+      {dual && <span className="text-[8px] text-amber-400/70 flex-shrink-0 leading-none">dual</span>}
       {comp.fields?.node_id != null && (
         <span className="text-[9px] text-gray-600 flex-shrink-0">#{comp.fields.node_id}</span>
       )}

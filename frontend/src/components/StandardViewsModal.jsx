@@ -95,8 +95,8 @@ export default function StandardViewsModal({ onClose }) {
                       isActive
                         ? 'border-green-500 bg-green-950/30 hover:bg-green-950/50'
                         : isSuggested
-                        ? 'border-blue-500 bg-blue-950/30 hover:bg-blue-950/50'
-                        : 'border-gray-700 bg-gray-800/40 hover:bg-gray-800 hover:border-blue-600'
+                        ? 'border-amber-500 bg-blue-950/30 hover:bg-blue-950/50'
+                        : 'border-gray-700 bg-gray-800/40 hover:bg-gray-800 hover:border-amber-600'
                     }`}
                   >
                     {isActive && (
@@ -105,7 +105,7 @@ export default function StandardViewsModal({ onClose }) {
                       </span>
                     )}
                     {isSuggested && (
-                      <span className="absolute top-2 right-2 text-[10px] bg-blue-600 text-white px-1.5 py-0.5 rounded font-medium leading-tight">
+                      <span className="absolute top-2 right-2 text-[10px] bg-amber-600 text-white px-1.5 py-0.5 rounded font-medium leading-tight">
                         ✓ Suggested
                       </span>
                     )}

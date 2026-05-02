@@ -108,7 +108,7 @@ function AirframeSection({ activeView, backgroundImageTop, backgroundImageBottom
       <button
         onClick={() => setStandardViewsOpen(true)}
         className="relative w-full text-xs px-2 py-1.5 rounded border border-blue-800/60
-                   text-blue-300 hover:bg-blue-900/30 mt-1">
+                   text-amber-300 hover:bg-amber-900/20 mt-1">
         Standard view…
         {viewMismatch && (
           <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-amber-400"
@@ -139,7 +139,7 @@ const CUBE_VARIANT_ICONS = {
 // ── Shared input / select classes ─────────────────────────────────────────────
 const INPUT_CLS =
   'bg-gray-900 text-gray-200 text-sm border border-gray-600 rounded ' +
-  'px-2 py-1.5 w-full focus:outline-none focus:border-blue-500'
+  'px-2 py-1.5 w-full focus:outline-none focus:border-amber-500'
 const SELECT_CLS = INPUT_CLS + ' cursor-pointer'
 
 // ── Individual field-type renderers ───────────────────────────────────────────
@@ -178,7 +178,7 @@ function FieldToggle({ field, value, onChange }) {
       type="button"
       onClick={() => onChange(!checked)}
       className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors
-                  ${checked ? 'bg-blue-600' : 'bg-gray-600'}`}>
+                  ${checked ? 'bg-amber-600' : 'bg-gray-600'}`}>
       <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform
                         ${checked ? 'translate-x-4' : 'translate-x-0.5'}`} />
     </button>
@@ -211,7 +211,7 @@ function FieldBitmask({ field, value, onChange }) {
               onClick={() => toggle(b.bit)}>
               <span className={`w-3.5 h-3.5 flex-shrink-0 rounded border transition-colors
                 ${checked
-                  ? 'bg-blue-600 border-blue-500'
+                  ? 'bg-amber-600 border-amber-500'
                   : 'border-gray-500 group-hover:border-blue-400'}`}>
                 {checked && (
                   <svg viewBox="0 0 10 10" className="w-3.5 h-3.5 text-white">
@@ -251,7 +251,7 @@ function FieldMultiselect({ field, value, onChange }) {
             onClick={() => onChange(cur ^ o.value)}>
             <span className={`w-3.5 h-3.5 flex-shrink-0 rounded border transition-colors
               ${checked
-                ? 'bg-blue-600 border-blue-500'
+                ? 'bg-amber-600 border-amber-500'
                 : 'border-gray-500 group-hover:border-blue-400'}`}>
               {checked && (
                 <svg viewBox="0 0 10 10" className="w-3.5 h-3.5 text-white">
@@ -290,7 +290,7 @@ function TooltipIcon({ field, vehicleType }) {
 
   return (
     <span ref={spanRef} className="inline-flex items-center" onMouseEnter={handleEnter} onMouseLeave={handleLeave}>
-      <span className="text-[10px] text-gray-600 hover:text-blue-400 cursor-help select-none ml-0.5 leading-none">
+      <span className="text-[10px] text-gray-600 hover:text-amber-400 cursor-help select-none ml-0.5 leading-none">
         ⓘ
       </span>
       {pos && createPortal(
@@ -303,7 +303,7 @@ function TooltipIcon({ field, vehicleType }) {
           <p className="text-[10px] text-gray-300 leading-relaxed">{field.tooltip}</p>
           {docsUrl && (
             <a href={docsUrl} target="_blank" rel="noreferrer"
-              className="text-[9px] text-blue-400 hover:text-blue-300 mt-1.5 block">
+              className="text-[9px] text-amber-400 hover:text-amber-300 mt-1.5 block">
               View in ArduPilot docs ↗
             </a>
           )}
@@ -629,7 +629,7 @@ export default function Inspector() {
             className={`text-[9px] px-1.5 py-0.5 rounded border transition-colors ${
               inspectorSimpleMode
                 ? 'border-gray-600 text-gray-500 hover:text-gray-300'
-                : 'border-blue-700/60 bg-blue-900/20 text-blue-400'
+                : 'border-blue-700/60 bg-blue-900/20 text-amber-400'
             }`}
             title={inspectorSimpleMode ? 'Show all fields' : 'Hide advanced fields'}>
             {inspectorSimpleMode ? 'Simple' : 'Full'}

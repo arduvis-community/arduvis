@@ -60,8 +60,8 @@ export const api = {
   getComponentDefs: (vehicle) => request('GET', `/components/definitions?vehicle=${vehicle}`),
   getComponentDef:  (defId)   => request('GET', `/components/${defId}`),
 
-  // ArduPilot param metadata
-  getParamMeta:    (vehicle) => request('GET', `/params/meta?vehicle=${vehicle}`),
+  // ArduPilot param metadata — cache-busted so WebView2 never serves a stale response
+  getParamMeta:    (vehicle) => request('GET', `/params/meta?vehicle=${vehicle}&_=${Date.now()}`),
   compareParam:    (payload) => request('POST', '/export/compare',             payload),
 
   // MAVLink

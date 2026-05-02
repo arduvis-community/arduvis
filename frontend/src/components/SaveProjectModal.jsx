@@ -73,7 +73,7 @@ export default function SaveProjectModal({ onClose }) {
           placeholder="my-quad"
           maxLength={64}
           className="w-full bg-gray-800 text-gray-200 text-sm border border-gray-600 rounded
-                     px-2.5 py-1.5 mb-4 focus:outline-none focus:border-blue-500"
+                     px-2.5 py-1.5 mb-4 focus:outline-none focus:border-amber-500"
         />
 
         {/* Directory */}
@@ -84,7 +84,7 @@ export default function SaveProjectModal({ onClose }) {
           onKeyDown={e => { if (e.key === 'Enter') handleSave(); if (e.key === 'Escape') onClose() }}
           placeholder={DEFAULT_BASE}
           className="w-full bg-gray-800 text-gray-200 text-sm border border-gray-600 rounded
-                     px-2.5 py-1.5 mb-1 focus:outline-none focus:border-blue-500 font-mono"
+                     px-2.5 py-1.5 mb-1 focus:outline-none focus:border-amber-500 font-mono"
         />
 
         {/* Path preview */}
@@ -109,8 +109,8 @@ export default function SaveProjectModal({ onClose }) {
           <button
             onClick={handleSave}
             disabled={!name.trim() || saving}
-            className="text-xs px-4 py-1.5 rounded border border-blue-600 bg-blue-700/20
-                       text-blue-300 hover:bg-blue-700/40 disabled:opacity-40 font-medium">
+            className="text-xs px-4 py-1.5 rounded border border-amber-600 bg-amber-700/20
+                       text-amber-300 hover:bg-amber-700/40 disabled:opacity-40 font-medium">
             {saving ? 'Saving…' : 'Save'}
           </button>
         </div>
