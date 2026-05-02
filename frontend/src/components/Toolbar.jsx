@@ -24,6 +24,7 @@ import SaveProjectModal from './SaveProjectModal'
 import AboutModal from './AboutModal'
 import HelpModal from './HelpModal'
 import MAVLinkModal from './MAVLinkModal'
+import ValidationModal from './ValidationModal'
 
 export default function Toolbar() {
   const {
@@ -65,9 +66,10 @@ export default function Toolbar() {
   }, [showFileMenu])
   const paramImportRef   = useRef(null)
   const paramCompareRef  = useRef(null)
-  const [importPreview, setImportPreview] = useState(null)  // { params, count, vehicle_type, components } | null
+  const [importPreview,    setImportPreview]    = useState(null)
+  const [validationResult, setValidationResult] = useState(null)
 
-  const handleExport = async () => {
+  const doExport = async () => {
     const { components, vehicleType, vehicleLabel, frameInfo, baselineParams, exportIncludeDefaults } = useAppStore.getState()
     try {
       const content  = await api.exportParam({
@@ -86,6 +88,25 @@ export default function Toolbar() {
         a.click(); URL.revokeObjectURL(url)
       }
     } catch(e) { console.error(e) }
+  }
+
+  const handleExport = async () => {
+    const { components, vehicleType, frameInfo, baselineParams } = useAppStore.getState()
+    try {
+      const result = await api.validate({
+        components, vehicle_type: vehicleType,
+        frame_info: frameInfo || null,
+        baseline_params: baselineParams || {},
+      })
+      if (result.errors.length > 0 || result.warnings.length > 0) {
+        setValidationResult({ errors: result.errors, warnings: result.warnings })
+      } else {
+        doExport()
+      }
+    } catch(e) {
+      console.warn('Validation failed, proceeding with export:', e)
+      doExport()
+    }
   }
 
   const handleParamImport = async (e) => {
@@ -143,6 +164,14 @@ export default function Toolbar() {
     {showSave && <SaveProjectModal onClose={() => setShowSave(false)} />}
     {showAbout && <AboutModal onClose={() => setShowAbout(false)} />}
     {showHelp  && <HelpModal  onClose={() => setShowHelp(false)}  />}
+    {validationResult && (
+      <ValidationModal
+        errors={validationResult.errors}
+        warnings={validationResult.warnings}
+        onExport={doExport}
+        onClose={() => setValidationResult(null)}
+      />
+    )}
     {mavlinkModalOpen && <MAVLinkModal onClose={() => setMavlinkModalOpen(false)} />}
 
     <div className="flex flex-wrap items-center gap-x-2 gap-y-1 px-3 py-1 min-h-10 bg-gray-900 border-b border-gray-700 flex-shrink-0">
