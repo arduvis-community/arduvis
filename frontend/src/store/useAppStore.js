@@ -70,6 +70,16 @@ export const useAppStore = create(
       setBaselineParam:    (key, v) => set(s => ({ baselineParams: { ...s.baselineParams, [key.toUpperCase()]: v }, isDirty: true })),
       deleteBaselineParam: (key)    => set(s => { const p = { ...s.baselineParams }; delete p[key]; return { baselineParams: p, isDirty: true } }),
 
+      // ── Web Serial (direct USB to FC) ─────────────────────────────────────
+      webSerialSession:   null,
+      webSerialConnected: false,
+      webSerialPort:      null,
+      setWebSerialSession: (session, port) => set({
+        webSerialSession:   session,
+        webSerialConnected: !!session,
+        webSerialPort:      port ?? null,
+      }),
+
       // ── Advanced params panel ──────────────────────────────────────────────
       advancedParamsOpen: false,
       toggleAdvancedParams: () => set(s => ({ advancedParamsOpen: !s.advancedParamsOpen, inspectorOpen: false, checklistOpen: false })),

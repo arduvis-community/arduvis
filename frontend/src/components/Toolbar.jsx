@@ -30,7 +30,7 @@ export default function Toolbar() {
     vehicleType, setVehicleType,
     projectName, setProjectName, isDirty,
     newProject,
-    mavlinkConnected, mavlinkModalOpen, setMavlinkModalOpen,
+    mavlinkConnected, mavlinkModalOpen, setMavlinkModalOpen, webSerialConnected,
     toggleInspector,
     advancedParamsOpen, toggleAdvancedParams,
     checklistOpen, toggleChecklist,
@@ -145,10 +145,13 @@ export default function Toolbar() {
     {showHelp  && <HelpModal  onClose={() => setShowHelp(false)}  />}
     {mavlinkModalOpen && <MAVLinkModal onClose={() => setMavlinkModalOpen(false)} />}
 
-    <div className="flex items-center gap-3 px-3 h-10 bg-gray-900 border-b border-gray-700 flex-shrink-0">
+    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 px-3 py-1 min-h-10 bg-gray-900 border-b border-gray-700 flex-shrink-0">
+
+      {/* ── Identity group (always row 1) ─────────────────────────────────── */}
+      <div className="flex items-center gap-2 flex-shrink-0">
 
       {/* Logo */}
-      <div className="flex items-center gap-2 mr-2">
+      <div className="flex items-center gap-2 mr-1">
         <div className="w-5 h-5 rounded-full bg-amber-600 flex-shrink-0" />
         <span className="text-sm font-semibold text-white tracking-wide">AVC</span>
       </div>
@@ -238,7 +241,10 @@ export default function Toolbar() {
 
       {isDirty && <span className="text-amber-400 text-xs" title="Unsaved changes">●</span>}
 
-      <div className="w-px h-5 bg-gray-700" />
+      </div>{/* end identity group */}
+
+      {/* ── Workspace buttons group ───────────────────────────────────────── */}
+      <div className="flex items-center gap-2 flex-shrink-0">
 
       <button
         onClick={() => setCanvasMode('standard')}
@@ -293,20 +299,20 @@ export default function Toolbar() {
         Wires
       </button>
 
-      <div className="w-px h-5 bg-gray-700" />
+      </div>{/* end workspace group */}
 
-      {/* Spacer */}
-      <div className="flex-1" />
+      {/* ── Right group: connection + export (ml-auto pushes right) ──────── */}
+      <div className="flex items-center gap-2 ml-auto flex-shrink-0">
 
       {/* MAVLink status pill — click to open connection modal */}
       <button
         onClick={() => setMavlinkModalOpen(true)}
         className={`flex items-center gap-1.5 text-xs px-2 py-1 rounded border
-          ${mavlinkConnected
+          ${(mavlinkConnected || webSerialConnected)
             ? 'border-green-700 text-green-400 hover:bg-green-900/30'
             : 'border-gray-600 text-gray-400 hover:bg-gray-700'}`}>
-        <div className={`w-2 h-2 rounded-full ${mavlinkConnected ? 'bg-green-400' : 'bg-gray-600'}`} />
-        {mavlinkConnected ? 'MP connected' : 'MP disconnected'}
+        <div className={`w-2 h-2 rounded-full ${(mavlinkConnected || webSerialConnected) ? 'bg-green-400' : 'bg-gray-600'}`} />
+        {webSerialConnected ? 'USB connected' : mavlinkConnected ? 'MP connected' : 'MP disconnected'}
       </button>
 
       {/* ⋯ menu */}
@@ -386,7 +392,9 @@ export default function Toolbar() {
                    hover:bg-amber-900/30">
         Compare
       </button>
-    </div>
+
+      </div>{/* end right group */}
+    </div>{/* end toolbar */}
 
     {/* Param import preview modal */}
     {importPreview && (

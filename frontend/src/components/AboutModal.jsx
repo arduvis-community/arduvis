@@ -40,7 +40,10 @@ export default function AboutModal({ onClose }) {
               <div className="text-white font-semibold text-base leading-tight">
                 ArduPilot Visual Configurator
               </div>
-              <div className="text-gray-400 text-xs mt-0.5">Version 0.1.0 — Beta</div>
+              <div className="text-gray-400 text-xs mt-0.5">
+                Build <span className="text-amber-300 font-mono">b{__BUILD_NUMBER__}</span>
+                <span className="ml-2">— Beta · Community Edition</span>
+              </div>
             </div>
           </div>
 

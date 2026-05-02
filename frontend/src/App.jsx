@@ -30,8 +30,11 @@ export default function App() {
           checklistOpen, comparisonModalOpen } = useAppStore()
   const [showDisclaimer, setShowDisclaimer] = useState(needsDisclaimer)
 
-  // Ping backend on mount
-  useEffect(() => { checkHealth() }, [])
+  // Set window title with build number and ping backend on mount
+  useEffect(() => {
+    document.title = `AVC b${__BUILD_NUMBER__}`
+    checkHealth()
+  }, [])
 
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-gray-900">
