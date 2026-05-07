@@ -5,22 +5,45 @@ Builds are numbered `b001`, `b002`, … — the build number appears in the wind
 
 ---
 
-## b034 — Avionics theme, full ArduPilot params, wiring fixes
+## b034 — Avionics theme, full ArduPilot params, safety validation, USB connection
 
 ### Visual refresh
 - **Avionics/amber colour scheme** — deep navy background (#0A0E1A), amber/gold active states replacing generic blue. Selected components have an amber border on canvas.
 - **Dot-grid canvas background** — subtle engineering-paper dot grid tracks with pan and zoom.
 - **Inter font** loaded from Google Fonts for a sharper UI.
-- CubePilot hardware badge keeps blue (semantic exception — it identifies hardware, not UI state).
+- **Toolbar wraps to a second row** on narrow windows instead of being cut off.
+- **Build number** shown in About modal and window title (e.g. "AVC b034").
 
 ### Full ArduPilot parameter browser
 - **5,691 copter / 5,729 plane parameters** — sourced directly from `autotest.ardupilot.org` (the same source Mission Planner uses). Previous build had ~934/1,167 from a partial source.
 - All `INS_HNTCH_*`, `EK3_*`, `ATC_RAT_*`, and other tuning params now appear with correct descriptions, ranges, units, enum dropdowns, and bitmask checkboxes.
 - **Safer +defaults export** — PID, EKF, notch filter, WPNAV, RTL, and acro number fields are no longer filled when using +defaults. Only values you explicitly set are exported for these components.
 
+### Pre-export safety validation
+- Clicking **Export .param** now runs a safety check first:
+  - **Errors (block export):** No flight controller, no motors/ESCs (copter/VTOL), no failsafe component, duplicate output pin assignments.
+  - **Warnings (advisory):** Failsafe added but unconfigured, GPS-dependent flight modes without a GPS, imported params being re-exported unchanged.
+- A modal shows all issues. Errors prevent export; warnings show an "Export anyway" option. "Open Checklist" guides you to missing items.
+
+### USB direct connection (Web Serial)
+- **Connect directly to CubePilot via USB** — no Mission Planner required. Click the MP status pill → USB tab → "Select USB port…".
+- **Upload params to FC** — sends all configured parameters directly to the flight controller over USB.
+- **Pull params from FC** — downloads all parameters and reconstructs the canvas components, identical to importing a .param file.
+- Baud rate configurable (default 115200). The status pill shows "USB connected" when active.
+
 ### Wiring fixes
 - **ESC drag now works** — ESC, servo, GPS, airspeed, battery monitor, rangefinder, and ADSB components can now be dragged directly onto the canvas.
 - **PWM auto-wiring** — when exactly one flight controller is on the canvas, components without an explicit FC assignment automatically draw a wire to it.
+
+### Import fixes
+- **Disabled sensors no longer imported** — battery monitors (BATT*_MONITOR=0), GPS instances (GPS_TYPE=0), airspeed sensors (ARSPD*_TYPE=0), and rangefinders (RNGFND*_TYPE=0) are skipped when set to disabled in the source .param file. Previously importing a real vehicle's param file would create 9 battery monitors, 8 rangefinders, etc.
+
+### Component defaults audit
+- Fixed 4 out-of-range parameter defaults found by cross-referencing ArduPilot's official metadata:
+  - `RC_FS_TIMEOUT` was stored in ms (1500) but ArduPilot expects seconds — corrected to 0.5 s.
+  - `H_COL_LAND_MIN` used PWM range (800–2200 µs) but expects degrees (−5 to 0).
+  - `SPRAY_SPINNER` default 0 was below the valid PWM range (1000–2000).
+  - Gimbal RC channel selects now include "Disabled" (0) as a valid option.
 
 ### Setup Checklist fixes
 - Airframe step correctly detects when a standard view is selected.

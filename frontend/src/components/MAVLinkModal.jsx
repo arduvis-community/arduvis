@@ -134,9 +134,23 @@ export default function MAVLinkModal({ onClose }) {
           setBusyMsg(`Downloading params… ${received}/${total ?? '?'}`)
         })
         setProgress(null)
+        setBusyMsg('Reconstructing configuration…')
+        // Format as .param text and send through the import endpoint so components
+        // are reconstructed on the canvas — same result as importing a Mission Planner file
+        const paramText = Object.entries(params).map(([n, v]) => `${n},${v}`).join('\n')
+        const importResult = await api.importParam(paramText)
         const store = useAppStore.getState()
-        store.setBaselineParams(params)
-        setResult(`Pulled ${Object.keys(params).length} params from FC`)
+        store.newProject()
+        store.setVehicleType(importResult.vehicle_type)
+        store.setBaselineParams(importResult.params)
+        for (const comp of importResult.components) {
+          const id = store.addComponent(comp.defId, comp.label, comp.icon, comp.virtual, comp.x, comp.y)
+          if (comp.noCanvas) store.updateComponent(id, { noCanvas: true })
+          for (const [key, val] of Object.entries(comp.fields || {})) {
+            store.updateComponentField(id, key, val)
+          }
+        }
+        setResult(`Pulled ${Object.keys(params).length} params — ${importResult.components.length} component(s) loaded`)
       } catch (err) { setError(err.message || String(err)) }
       finally { setBusy(false); setBusyMsg(''); setProgress(null) }
     } else {
