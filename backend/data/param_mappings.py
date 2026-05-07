@@ -108,11 +108,11 @@ def build_param_list(
     for _c in components:
         _did = _c.get("defId", "")
         _pin = _comp_pin(_c)
-        _flds = _c.get("fields", {})
-        _conn = _flds.get("connection_type", "pwm")
-        _role = _flds.get("esc_role", "motor")
         if _pin is not None:
             _sn = _pin_to_servo(_pin)
+            _flds = _c.get("fields", {})
+            _conn = _flds.get("connection_type", "pwm")
+            _role = _flds.get("esc_role", "motor")
             if _sn and (
                 _did == "motor"
                 or (_did == "servo" and _conn != "dronecan")
@@ -284,7 +284,6 @@ def build_param_list(
         # ── Arming ────────────────────────────────────────────────────────────
         elif defId == "arming":
             for key, param in [
-                ("arming_check",     "ARMING_CHECK"),
                 ("arming_accthresh", "ARMING_ACCTHRESH"),
                 ("arming_magthresh", "ARMING_MAGTHRESH"),
                 ("arming_require",   "ARMING_REQUIRE"),
@@ -537,7 +536,7 @@ def build_param_list(
                     v = fields[key]
                     add("Flight Options", param, _bool_int(v) if isinstance(v, bool) else v)
 
-        # ── ESC (all roles / connections) ─────────────────────────────────────
+        # ── ESC ───────────────────────────────────────────────────────────────
         elif defId == "esc":
             conn = fields.get("connection_type", "pwm")
             role = fields.get("esc_role", "motor")
@@ -1303,10 +1302,9 @@ def build_components_from_params(params: dict[str, float]) -> dict:
             add_v("brd_config", "Flight Controller", "🖥", f)
 
     # ── Arming ────────────────────────────────────────────────────────────
-    if has("ARMING_CHECK", "ARMING_ACCTHRESH", "ARMING_REQUIRE", "ARMING_RUDDER"):
+    if has("ARMING_ACCTHRESH", "ARMING_REQUIRE", "ARMING_RUDDER"):
         f = {}
         for pn, key, cast in [
-            ("ARMING_CHECK",     "arming_check",     int),
             ("ARMING_MAGTHRESH", "arming_magthresh",  int),
             ("ARMING_REQUIRE",   "arming_require",    int),
             ("ARMING_RUDDER",    "arming_rudder",     int),
@@ -1501,6 +1499,8 @@ def build_components_from_params(params: dict[str, float]) -> dict:
         monitor_param = f"{pfx}_MONITOR"
         if monitor_param not in p:
             continue
+        if int(float(p[monitor_param])) == 0:   # 0 = disabled — skip
+            continue
         f: dict = {"instance": instance}
         for suffix, key, cast in [
             ("MONITOR",    "batt_monitor",  int),
@@ -1527,6 +1527,8 @@ def build_components_from_params(params: dict[str, float]) -> dict:
         suffix = "" if instance == 1 else str(instance)
         gps_type_param = f"GPS_TYPE{suffix}"
         if gps_type_param not in p:
+            continue
+        if int(float(p[gps_type_param])) == 0:   # 0 = disabled — skip
             continue
         f = {"instance": instance, "gps_type": int(p[gps_type_param])}
         # Find serial port assigned to GPS (protocol=5)
@@ -1562,6 +1564,8 @@ def build_components_from_params(params: dict[str, float]) -> dict:
         type_param = f"{pfx}_TYPE"
         if type_param not in p:
             continue
+        if int(float(p[type_param])) == 0:   # 0 = disabled — skip
+            continue
         f = {"instance": instance}
         for suffix, key, cast in [
             ("TYPE",     "arspd_type",     int),
@@ -1582,6 +1586,8 @@ def build_components_from_params(params: dict[str, float]) -> dict:
         type_param = f"RNGFND{instance}_TYPE"
         if type_param not in p:
             break
+        if int(float(p[type_param])) == 0:   # 0 = disabled — skip
+            continue
         f = {"instance": instance}
         for suffix, key, cast in [
             ("TYPE",     "rngfnd_type",    int),
@@ -1641,8 +1647,7 @@ def build_components_from_params(params: dict[str, float]) -> dict:
         if blh_bidi:                 esc_f["blheli_bidi"]     = True
         if blh_poles is not None:    esc_f["blheli_poles"]    = blh_poles
         if esc_f:
-            esc_f["connection_type"] = "pwm"
-            esc_f["esc_role"] = "motor"
+            esc_f = {"connection_type": "pwm", "esc_role": "motor", **esc_f}
             add_p("esc", "ESC", "⚡", esc_f)
 
         # One Motor chip per SERVO output in the motor function range
@@ -1659,39 +1664,64 @@ def build_components_from_params(params: dict[str, float]) -> dict:
                 f["reversed"] = bool(int(p[f"SERVO{servo_n}_REVERSED"]))
             add_p("motor", f"Motor {motor_num}", "🔄", f)
 
-    # ── Servos + throttle ESCs (plane + vtol) ────────────────────────────
+    # ── Servo / ESC outputs (plane) ───────────────────────────────────────
     elif vehicle_type in ("plane", "vtol"):
-        _THROTTLE_FUNCS = {70: "Throttle", 73: "Throttle Left", 74: "Throttle Right"}
+        _THROTTLE_FUNCS = {70, 73, 74}
         _ALL_SERVO_FUNCS = {**_SURFACE_FUNCS, **_TILT_FUNCS}
         for servo_n in range(1, 15):
             fn = p.get(f"SERVO{servo_n}_FUNCTION")
             if fn is None:
                 continue
             fn_int = int(fn)
-            if fn_int in _THROTTLE_FUNCS:
-                label = _THROTTLE_FUNCS[fn_int]
-                f: dict = {"connection_type": "pwm", "esc_role": "throttle",
-                           "output_pin": servo_n, "servo_function": fn_int}
-                for suffix, key in [("MIN", "servo_min"), ("MAX", "servo_max"), ("TRIM", "servo_trim")]:
-                    v = fval(f"SERVO{servo_n}_{suffix}")
-                    if v is not None:
-                        f[key] = int(v)
-                if f"SERVO{servo_n}_REVERSED" in p:
-                    f["reversed"] = bool(int(p[f"SERVO{servo_n}_REVERSED"]))
-                add_p("esc", label, "⚡", f)
-            elif fn_int in _ALL_SERVO_FUNCS:
-                label = _ALL_SERVO_FUNCS[fn_int]
-                f = {"connection_type": "pwm", "output_pin": servo_n, "servo_function": fn_int}
-                for suffix, key in [("MIN", "servo_min"), ("MAX", "servo_max"), ("TRIM", "servo_trim")]:
-                    v = fval(f"SERVO{servo_n}_{suffix}")
-                    if v is not None:
-                        f[key] = int(v)
-                if f"SERVO{servo_n}_REVERSED" in p:
-                    f["reversed"] = bool(int(p[f"SERVO{servo_n}_REVERSED"]))
-                v = fval(f"SERVO{servo_n}_RATE")
+            _srv_min_max_trim = []
+            for suffix, key in [("MIN", "servo_min"), ("MAX", "servo_max"), ("TRIM", "servo_trim")]:
+                v = fval(f"SERVO{servo_n}_{suffix}")
                 if v is not None:
-                    f["servo_rate"] = int(v)
+                    _srv_min_max_trim.append((key, int(v)))
+            _reversed = bool(int(p[f"SERVO{servo_n}_REVERSED"])) if f"SERVO{servo_n}_REVERSED" in p else None
+            if fn_int in _THROTTLE_FUNCS:
+                f = {"connection_type": "pwm", "esc_role": "throttle",
+                     "output_pin": servo_n, "servo_function": fn_int}
+                for k, v in _srv_min_max_trim:
+                    f[k] = v
+                if _reversed is not None:
+                    f["reversed"] = _reversed
+                add_p("esc", "ESC (Throttle)", "⚡", f)
+            else:
+                label = _ALL_SERVO_FUNCS.get(fn_int)
+                if label is None:
+                    continue
+                f = {"connection_type": "pwm", "output_pin": servo_n, "servo_function": fn_int}
+                for k, v in _srv_min_max_trim:
+                    f[k] = v
+                if _reversed is not None:
+                    f["reversed"] = _reversed
+                rate = fval(f"SERVO{servo_n}_RATE")
+                if rate is not None:
+                    f["servo_rate"] = int(rate)
                 add_p("servo", label, "↔", f)
+
+    # ── Tilt servos (vtol via copter motor path) ──────────────────────────
+    if vehicle_type == "vtol":
+        for servo_n in range(1, 15):
+            fn = p.get(f"SERVO{servo_n}_FUNCTION")
+            if fn is None:
+                continue
+            fn_int = int(fn)
+            label = _TILT_FUNCS.get(fn_int)
+            if label is None:
+                continue
+            f = {"connection_type": "pwm", "output_pin": servo_n, "servo_function": fn_int}
+            for suffix, key in [("MIN", "servo_min"), ("MAX", "servo_max"), ("TRIM", "servo_trim")]:
+                v = fval(f"SERVO{servo_n}_{suffix}")
+                if v is not None:
+                    f[key] = int(v)
+            if f"SERVO{servo_n}_REVERSED" in p:
+                f["reversed"] = bool(int(p[f"SERVO{servo_n}_REVERSED"]))
+            rate = fval(f"SERVO{servo_n}_RATE")
+            if rate is not None:
+                f["servo_rate"] = int(rate)
+            add_p("servo", label, "↔", f)
 
     # ── Attitude Controller ───────────────────────────────────────────────
     if has("ATC_RAT_RLL_P", "ATC_RAT_PIT_P", "ATC_RAT_YAW_P",
